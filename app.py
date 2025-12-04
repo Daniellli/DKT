@@ -7,7 +7,7 @@ from PIL import Image
 from loguru import logger
 from tqdm import tqdm
 from tools.common_utils import save_video
-from dkt.pipelines.wan_video_new import WanVideoPipeline, ModelConfig
+from dkt.pipelines.pipelines import WanVideoPipeline, ModelConfig
 
 import cv2
 import copy
@@ -21,7 +21,7 @@ import glob
 import datetime
 import shutil
 import tempfile
-
+from dkt.pipelines.pipelines import extract_frames_from_video_file, resize_frame
 
 PIPE_1_3B = None
 MOGE_MODULE =  None
@@ -30,16 +30,6 @@ NEGATIVE_PROMPT = ''
 
 SAVE_DIR = "logs/gradio"
 os.makedirs(SAVE_DIR, exist_ok=True)
-
-
-
-def resize_frame(frame, height, width):
-    frame = np.array(frame)
-    frame = torch.from_numpy(frame).permute(2, 0, 1).unsqueeze(0).float() / 255.0
-    frame = torch.nn.functional.interpolate(frame, (height, width), mode="bicubic", align_corners=False, antialias=True)
-    frame = (frame.squeeze(0).permute(1, 2, 0).clamp(0, 1) * 255).byte().numpy()
-    frame = Image.fromarray(frame)
-    return frame
 
 
 
@@ -90,28 +80,6 @@ def create_simple_glb_from_pointcloud(points, colors, glb_filename):
 
 
 
-def extract_frames_from_video_file(video_path):
-    try:
-        cap = cv2.VideoCapture(video_path)
-        frames = []
-        
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        if fps <= 0:
-            fps = 15.0
-        
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame_rgb = Image.fromarray(frame_rgb)
-            frames.append(frame_rgb)
-        
-        cap.release()
-        return frames, fps
-    except Exception as e:
-        logger.error(f"Error extracting frames from {video_path}: {str(e)}")
-        return [], 15.0
 
 
 
@@ -222,8 +190,6 @@ def process_video(
 
 
         
-        
-        
         original_filename = f"input_{timestamp}.mp4"
         dst_path = os.path.join(cur_save_dir, original_filename)
         shutil.copy2(tmp_video_path, dst_path)
@@ -270,9 +236,8 @@ def process_video(
         #* moge process 
         torch.cuda.empty_cache()
         processed_video = video[:frame_length]
-
-
         processed_video = [resize_frame(frame, original_height, original_width) for frame in processed_video]
+
         if ROTATE:
             processed_video = [x.transpose(Image.ROTATE_270) for x in processed_video]
             origin_frames = [x.transpose(Image.ROTATE_270) for x in origin_frames]
@@ -306,6 +271,7 @@ def process_video(
 
         glb_files = []
         moge_device = MOGE_MODULE.device if MOGE_MODULE is not None else torch.device("cuda:0")
+        
         for idx in tqdm(indices):
             orgin_rgb_frame = origin_frames[idx]
             predicted_depth = processed_video[idx]
@@ -360,8 +326,6 @@ def process_video(
 
 
 def main():
-
-
 
     #* gradio creation and initialization
 

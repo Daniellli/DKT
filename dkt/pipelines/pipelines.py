@@ -715,6 +715,244 @@ class WanVideoPipeline(BasePipeline):
 
 
 
+def extract_frames_from_video_file(video_path):
+    try:
+        cap = cv2.VideoCapture(video_path)
+        frames = []
+        
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        if fps <= 0:
+            fps = 15.0
+        
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame_rgb = Image.fromarray(frame_rgb)
+            frames.append(frame_rgb)
+        
+        cap.release()
+        return frames, fps
+    except Exception as e:
+        logger.error(f"Error extracting frames from {video_path}: {str(e)}")
+        return [], 15.0
+
+
+def resize_frame(frame, height, width):
+    frame = np.array(frame)
+    frame = torch.from_numpy(frame).permute(2, 0, 1).unsqueeze(0).float() / 255.0
+    frame = torch.nn.functional.interpolate(frame, (height, width), mode="bicubic", align_corners=False, antialias=True)
+    frame = (frame.squeeze(0).permute(1, 2, 0).clamp(0, 1) * 255).byte().numpy()
+    frame = Image.fromarray(frame)
+    return frame
+
+
+
+from moge.model.v2 import MoGeModel
+from tools.eval_utils import transfer_pred_disp2depth, colorize_depth_map
+from tools.depth2pcd import depth2pcd
+import cv2, copy
+class DKTPipeline:
+    def __init__(self,  ):
+
+        self.main_pipe = self.init_model()
+        self.moge_pipe = self.load_moge_model()
+
+
+    def init_model(self ):
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        pipe = WanVideoPipeline.from_pretrained(
+            torch_dtype=torch.bfloat16,
+            device=device,
+            model_configs=[
+                ModelConfig(
+                    model_id="PAI/Wan2.1-Fun-1.3B-Control",
+                    origin_file_pattern="diffusion_pytorch_model*.safetensors",
+                    offload_device="cpu",
+                ),
+                ModelConfig(
+                    model_id="PAI/Wan2.1-Fun-1.3B-Control",
+                    origin_file_pattern="models_t5_umt5-xxl-enc-bf16.pth",
+                    offload_device="cpu",
+                ),
+                ModelConfig(
+                    model_id="PAI/Wan2.1-Fun-1.3B-Control",
+                    origin_file_pattern="Wan2.1_VAE.pth",
+                    offload_device="cpu",
+                ),
+                ModelConfig(
+                    model_id="PAI/Wan2.1-Fun-1.3B-Control",
+                    origin_file_pattern="models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth",
+                    offload_device="cpu",
+                ),
+            ],
+            training_strategy="origin",
+        )
+        
+        
+        lora_config = ModelConfig(
+            model_id="Daniellesry/DKT-Depth-1-3B",
+            origin_file_pattern="dkt-1-3B.safetensors",
+            offload_device="cpu",
+        )
+        lora_config.download_if_necessary(use_usp=False)
+        
+        pipe.load_lora(pipe.dit, lora_config.path, alpha=1.0)#todo is it work?
+        pipe.enable_vram_management()
+        return pipe
+
+    def load_moge_model(self):
+        device= torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        
+        cached_model_path = 'checkpoints/moge_ckpt/moge-2-vitl-normal/model.pt'
+        if os.path.exists(cached_model_path):
+            logger.info(f"Found cached model at {cached_model_path}, loading from cache...")
+            moge_pipe = MoGeModel.from_pretrained(cached_model_path).to(device)
+        else:
+            logger.info(f"Cache not found at {cached_model_path}, downloading from HuggingFace...")
+            os.makedirs(os.path.dirname(cached_model_path), exist_ok=True)
+            moge_pipe = MoGeModel.from_pretrained('Ruicheng/moge-2-vitl-normal', cache_dir=os.path.dirname(cached_model_path)).to(device)
+        
+        return moge_pipe
+
+
+
+    def __call__(self, video_file, prompt='depth', \
+        negative_prompt='', height=480, width=832, \
+            num_inference_steps=5, window_size=21, \
+                overlap=3, vis_pc = False):
+        
+        
+        origin_frames, input_fps = extract_frames_from_video_file(video_file)
+
+        frame_length = len(origin_frames)
+
+        original_width, original_height = origin_frames[0].size
+
+        ROTATE = False 
+        if original_width <  original_height:#* ensure the width is the longer side
+            ROTATE = True
+            origin_frames = [x.transpose(Image.ROTATE_90) for x in origin_frames]
+            tmp = original_width
+            original_width = original_height
+            original_height = tmp
+
+
+        frames = [resize_frame(frame, height, width) for frame in origin_frames]
+
+
+        if (frame_length - 1) % 4 != 0:
+            new_len = ((frame_length - 1) // 4 + 1) * 4 + 1
+            frames = frames + [copy.deepcopy(frames[-1]) for _ in range(new_len - frame_length)]
+
+        
+
+        
+        video, vae_outs = self.main_pipe(
+            prompt=prompt,
+            negative_prompt=negative_prompt,
+            control_video=frames,
+            height=height,
+            width=width,
+            num_frames=len(frames),
+            seed=1,
+            tiled=False,
+            num_inference_steps=num_inference_steps,
+            sliding_window_size=window_size,
+            sliding_window_stride=window_size - overlap,
+            cfg_scale=1.0,
+        )
+        torch.cuda.empty_cache()
+
+        processed_video = video[:frame_length]
+        processed_video = [resize_frame(frame, original_height, original_width) for frame in processed_video]
+
+        if ROTATE:
+            processed_video = [x.transpose(Image.ROTATE_270) for x in processed_video]
+            origin_frames = [x.transpose(Image.ROTATE_270) for x in origin_frames]
+
+        color_predictions = []
+        if prompt == 'depth':
+            prediced_depth_map_np = [np.array(item).astype(np.float32).mean(-1)  for item in processed_video]
+            prediced_depth_map_np = np.stack(prediced_depth_map_np)
+            prediced_depth_map_np = prediced_depth_map_np / 255.0
+            
+            __min = prediced_depth_map_np.min()
+            __max = prediced_depth_map_np.max()
+
+            prediced_depth_map_np_normalized = (prediced_depth_map_np - __min) / (__max - __min)
+            color_predictions = [colorize_depth_map(item) for item in prediced_depth_map_np_normalized]
+        else:
+            color_predictions = processed_video
+
+        return_dict = {}
+        
+        return_dict['depth_map'] = prediced_depth_map_np
+        return_dict['colored_depth_map'] = color_predictions
+
+        if vis_pc and prompt == 'depth':
+            resize_W,resize_H = origin_frames[0].size
+            
+            vis_pc_num = 4
+            indices = np.linspace(0, frame_length-1, vis_pc_num)
+            indices = np.round(indices).astype(np.int32)
+            
+            glb_files = []
+            moge_device = self.moge_pipe.device if self.moge_pipe is not None else torch.device("cuda:0")
+            
+            for idx in tqdm(indices):
+                orgin_rgb_frame = origin_frames[idx]
+                predicted_depth = prediced_depth_map_np[idx]
+
+                # Read the input image and convert to tensor (3, H, W) with RGB values normalized to [0, 1]
+                input_image_np = np.array(orgin_rgb_frame)  # Convert PIL Image to numpy array
+                input_image = torch.tensor(input_image_np / 255, dtype=torch.float32, device=moge_device).permute(2, 0, 1) 
+                output = self.moge_pipe.infer(input_image)
+
+                #* "dict_keys(['points', 'intrinsics', 'depth', 'mask', 'normal'])"
+                moge_intrinsics = output['intrinsics'].cpu().numpy()
+                moge_mask = output['mask'].cpu().numpy()
+                moge_depth = output['depth'].cpu().numpy()
+            
+        
+                metric_depth = transfer_pred_disp2depth(predicted_depth, moge_depth, moge_mask)
+                
+                moge_intrinsics[0, 0] *= resize_W 
+                moge_intrinsics[1, 1] *= resize_H
+                moge_intrinsics[0, 2] *= resize_W
+                moge_intrinsics[1, 2] *= resize_H
+                pcd = depth2pcd(metric_depth, moge_intrinsics, color=input_image_np, input_mask=moge_mask, ret_pcd=True)
+                glb_files.append(pcd)
+            return_dict['selected_pc'] = glb_files
+        return return_dict
+
+
+
+
+    
+
+    
+
+        
+
+        
+
+        
+
+
+
+
+
+        
+        
+
+
+    
+        
+
+        
 
 
 
