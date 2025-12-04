@@ -1,0 +1,17 @@
+torch>=2.0.0
+torchvision
+transformers
+imageio
+imageio[ffmpeg]
+safetensors
+einops
+modelscope
+ftfy
+accelerate
+loguru
+git+https://github.com/microsoft/MoGe.git -i https://pypi.org/simple/  --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org
+sentencepiece
+trimesh
+opencv-python
+gradio_litmodel3d
+open3d
