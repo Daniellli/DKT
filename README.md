@@ -3,6 +3,8 @@
 
 
 
+## 🌟 Takeaways
+
 DKT is a foundation model for **transparent-object 🫙**, **in-the-wild 🌎**, **arbitrary-length ⏳** video depth and normal estimation, facilitating downstream applications such as robot manipulation tasks, policy learning, and so forth.
 
 ![teaser](doc/main-teaser.png)
@@ -55,7 +57,7 @@ python app.py
 
 
 
-## 🌟 Ackownledge
+## 💗 Ackownledge
 Our code is based on recent fantastic works including [MoGe](https://github.com/microsoft/MoGe), [WAN](https://github.com/Wan-Video/Wan2.1), and [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio). 
 We sincerely thank the authors for their excellent contributions. Huge thanks!
 
