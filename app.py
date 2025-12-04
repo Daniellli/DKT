@@ -28,6 +28,9 @@ MOGE_MODULE =  None
 PROMPT = 'depth'
 NEGATIVE_PROMPT = ''
 
+SAVE_DIR = "logs/gradio"
+os.makedirs(SAVE_DIR, exist_ok=True)
+
 
 
 def resize_frame(frame, height, width):
@@ -117,7 +120,16 @@ def load_moge_model(device="cuda:0"):
     if MOGE_MODULE is not None:
         return MOGE_MODULE
     logger.info(f"Loading MoGe model on {device}...")
-    MOGE_MODULE = MoGeModel.from_pretrained('Ruicheng/moge-2-vitl-normal').to(device)
+    cached_model_path = 'checkpoints/moge_ckpt/moge-2-vitl-normal/model.pt'
+
+    if os.path.exists(cached_model_path):
+        logger.info(f"Found cached model at {cached_model_path}, loading from cache...")
+        MOGE_MODULE = MoGeModel.from_pretrained(cached_model_path).to(device)
+    else:
+        logger.info(f"Cache not found at {cached_model_path}, downloading from HuggingFace...")
+        os.makedirs(os.path.dirname(cached_model_path), exist_ok=True)
+        MOGE_MODULE = MoGeModel.from_pretrained('Ruicheng/moge-2-vitl-normal', cache_dir=os.path.dirname(cached_model_path)).to(device)
+    
     return MOGE_MODULE
 
 
@@ -202,11 +214,14 @@ def process_video(
         if pipe is None:
             return None, f"Model {model_size} not initialized. Please restart the application."
         
+        
         tmp_video_path = video_file
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        cur_save_dir = join(SAVE_DIR, timestamp+f'_'+model_size)
+        os.makedirs(cur_save_dir, exist_ok=True)
 
-        # 使用临时目录存储所有文件
-        cur_save_dir = tempfile.mkdtemp(prefix=f'dkt_{timestamp}_{model_size}_')
+
+        
         
         
         original_filename = f"input_{timestamp}.mp4"
@@ -467,7 +482,8 @@ def main():
                 input_video = gr.Video(label="Input Video", elem_id='video-display-input')
                 
                 model_size = gr.Radio(
-                    choices=["1.3B", "14B"],
+                    # choices=["1.3B", "14B"],
+                    choices=["1.3B"],
                     value="1.3B",
                     label="Model Size"
                 )
@@ -594,7 +610,6 @@ def main():
     load_model_1_3b(device=device)
     load_moge_model(device=device)
     torch.cuda.empty_cache()
-
     demo.queue().launch(share = True,server_name="0.0.0.0", server_port=7860)
 
 
