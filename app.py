@@ -473,7 +473,7 @@ def main():
     width = 832
     window_size = 21
     with gr.Blocks(css=css, title="DKT", head=head_html) as demo:
-        gr.Markdown( "# Diffusion Knows Transparency: Repurposing Video Diffusion for Transparent Object Depth and Normal Estimation", elem_classes=["title"])
+        # gr.Markdown( "# Diffusion Knows Transparency: Repurposing Video Diffusion for Transparent Object Depth and Normal Estimation", elem_classes=["title"])
         # gr.Markdown(description, elem_classes=["description"])
         # gr.Markdown("### Video Processing Demo", elem_classes=["description"])
 
