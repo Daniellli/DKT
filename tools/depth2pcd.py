@@ -54,4 +54,4 @@ def depth2pcd(depth, intrinsic, color=None, input_mask=None, ret_pcd=False):
             pcd.colors = o3d.utility.Vector3dVector(colors)
         return pcd
     else:
-        return points, colors
+        return np.concatenate([points, colors], axis=1)

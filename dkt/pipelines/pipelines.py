@@ -822,7 +822,7 @@ class DKTPipeline:
     def __call__(self, video_file, prompt='depth', \
         negative_prompt='', height=480, width=832, \
             num_inference_steps=5, window_size=21, \
-                overlap=3, vis_pc = False):
+                overlap=3, vis_pc = False, return_rgb = False):
         
         
         origin_frames, input_fps = extract_frames_from_video_file(video_file)
@@ -892,41 +892,52 @@ class DKTPipeline:
         return_dict['depth_map'] = prediced_depth_map_np
         return_dict['colored_depth_map'] = color_predictions
 
+
+
         if vis_pc and prompt == 'depth':
-            resize_W,resize_H = origin_frames[0].size
-            
             vis_pc_num = 4
             indices = np.linspace(0, frame_length-1, vis_pc_num)
             indices = np.round(indices).astype(np.int32)
-            
-            glb_files = []
-            moge_device = self.moge_pipe.device if self.moge_pipe is not None else torch.device("cuda:0")
-            
-            for idx in tqdm(indices):
-                orgin_rgb_frame = origin_frames[idx]
-                predicted_depth = prediced_depth_map_np[idx]
+            return_dict['point_clouds'] = self.prediction2pc(prediced_depth_map_np, origin_frames, indices)
 
-                # Read the input image and convert to tensor (3, H, W) with RGB values normalized to [0, 1]
-                input_image_np = np.array(orgin_rgb_frame)  # Convert PIL Image to numpy array
-                input_image = torch.tensor(input_image_np / 255, dtype=torch.float32, device=moge_device).permute(2, 0, 1) 
-                output = self.moge_pipe.infer(input_image)
-
-                #* "dict_keys(['points', 'intrinsics', 'depth', 'mask', 'normal'])"
-                moge_intrinsics = output['intrinsics'].cpu().numpy()
-                moge_mask = output['mask'].cpu().numpy()
-                moge_depth = output['depth'].cpu().numpy()
-            
-        
-                metric_depth = transfer_pred_disp2depth(predicted_depth, moge_depth, moge_mask)
-                
-                moge_intrinsics[0, 0] *= resize_W 
-                moge_intrinsics[1, 1] *= resize_H
-                moge_intrinsics[0, 2] *= resize_W
-                moge_intrinsics[1, 2] *= resize_H
-                pcd = depth2pcd(metric_depth, moge_intrinsics, color=input_image_np, input_mask=moge_mask, ret_pcd=True)
-                glb_files.append(pcd)
-            return_dict['selected_pc'] = glb_files
+        if return_rgb:
+            return_dict['rgb_frames'] = origin_frames
         return return_dict
+
+        
+        
+        
+            
+    def prediction2pc(self, prediction_depth_map, RGB_frames, indices, return_pcd = True):
+        resize_W,resize_H = RGB_frames[0].size
+        pcds = []
+        moge_device = self.moge_pipe.device if self.moge_pipe is not None else torch.device("cuda:0")
+        
+        for idx in tqdm(indices):
+            orgin_rgb_frame = RGB_frames[idx]
+            predicted_depth = prediction_depth_map[idx]
+
+            # Read the input image and convert to tensor (3, H, W) with RGB values normalized to [0, 1]
+            input_image_np = np.array(orgin_rgb_frame)  # Convert PIL Image to numpy array
+            input_image = torch.tensor(input_image_np / 255, dtype=torch.float32, device=moge_device).permute(2, 0, 1) 
+            output = self.moge_pipe.infer(input_image)
+
+            #* "dict_keys(['points', 'intrinsics', 'depth', 'mask', 'normal'])"
+            moge_intrinsics = output['intrinsics'].cpu().numpy()
+            moge_mask = output['mask'].cpu().numpy()
+            moge_depth = output['depth'].cpu().numpy()
+        
+    
+            metric_depth = transfer_pred_disp2depth(predicted_depth, moge_depth, moge_mask)
+            
+            moge_intrinsics[0, 0] *= resize_W 
+            moge_intrinsics[1, 1] *= resize_H
+            moge_intrinsics[0, 2] *= resize_W
+            moge_intrinsics[1, 2] *= resize_H
+            
+            pcds.append(depth2pcd(metric_depth, moge_intrinsics, color=input_image_np, input_mask=moge_mask, ret_pcd=return_pcd))
+        
+        return pcds
 
 
 
