@@ -1,86 +1,55 @@
-"""
-    reference:
-    https://github.com/TencentARC/GeometryCrafter/blob/main/visualize/vis_point_maps.py
-
-"""
 import argparse
-import os
-import torch
-import torch.nn.functional as F
 import numpy as np
 from tqdm import tqdm
 import time
-from decord import cpu, VideoReader
-
-from kornia.filters import canny
-from kornia.morphology import dilation
+from loguru import logger
 import viser
-import viser.extras
 import viser.transforms as tf
-
-def compute_edge(depth: torch.Tensor):
-    magnitude, edges = canny(depth[None, None, :, :], low_threshold=0.4, high_threshold=0.5)
-    magnitude = magnitude[0, 0]
-    edges = edges[0, 0]
-    return edges > 0
-
-def dilation_mask(mask: torch.Tensor, edge_dilation_radius: int):
-    mask = mask.float()
-    mask = dilation(mask[None, None, :, :], torch.ones((edge_dilation_radius,edge_dilation_radius), device=mask.device))
-    return mask[0, 0] > 0.5
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--video_path', required=True, type=str)
-    parser.add_argument('--data_path', required=True, type=str)
+    parser.add_argument('data_path', type=str, default='logs/tmp_save_np_small.npz', help='path to npz file')
     parser.add_argument("--indices", type=int, default=None, nargs='+', help='only load these frames for visualization')
     parser.add_argument("--sample_num", type=int, default=None, help='only sample several frames for visualization')
-    parser.add_argument("--downsample_ratio", type=int, default=1, help='downsample ratio')
     parser.add_argument("--point_size", type=float, default=0.002, help='point size')  
     parser.add_argument("--scale_factor", type=float, default=1.0, help='point cloud scale factor for visualization')
-    parser.add_argument("--edge_dilation_radius", type=int, default=3, help='remove floater points for visualization')
     parser.add_argument("--port", type=int, default=7891, help='port')
     args = parser.parse_args()
 
+    # Load data from npz file
     data = np.load(args.data_path, allow_pickle=True)
-    point_map, mask = data['point_map'], data['mask']
+    point_cloud_data = data['arr_0']  # shape: [num_frame, num_pc, 6]
+
+    if len(point_cloud_data.shape) == 4 and point_cloud_data.shape[1] == 1:
+        point_cloud_data = np.squeeze(point_cloud_data, axis=1)
+    logger.info(f"point_cloud_data.shape: {point_cloud_data.shape}")
+
+    # Extract positions (first 3 dims) and colors (last 3 dims)
+    positions = point_cloud_data[:, :, :3]  # [num_frame, num_pc, 3]
+    colors = point_cloud_data[:, :, 3:6]   # [num_frame, num_pc, 3]
+    
+    num_frames = len(positions)
 
     if args.indices:
         indices = np.array(args.indices, dtype=np.int32)
     elif args.sample_num:
-        indices = np.linspace(0, len(point_map)-1, args.sample_num)
+        indices = np.linspace(0, num_frames-1, args.sample_num)
         indices = np.round(indices).astype(np.int32)
     else:
-        indices = np.array(list(range(len(point_map))))
+        indices = np.array(list(range(num_frames)))
     
-    point_map = torch.tensor(point_map[indices]).float()
-    mask = torch.tensor(mask[indices]).bool()
+    positions = positions[indices]  # [selected_frames, num_pc, 3]
+    colors = colors[indices]        # [selected_frames, num_pc, 3]
     
-    vid = VideoReader(args.video_path, ctx=cpu(0))
-    frames = torch.tensor(vid.get_batch(indices).asnumpy()).float()
-
-    H, W = point_map.shape[1:3]
-
-    if frames.shape[1:3] != (H, W):
-        frames = F.interpolate(frames.permute(0,3,1,2), (H, W), mode='bicubic').clamp(0, 255).permute(0,2,3,1)
-        
-
-    if args.downsample_ratio > 1:
-        H, W = H // args.downsample_ratio, W // args.downsample_ratio
-        point_map = F.interpolate(point_map.permute(0,3,1,2), (H, W)).permute(0,2,3,1)
-        frames = F.interpolate(frames.permute(0,3,1,2), (H, W)).permute(0,2,3,1)
-        mask = F.interpolate(mask.float()[:, None], (H, W))[:, 0] > 0.5
-
-    if args.edge_dilation_radius > 0:
-        for i in range(len(mask)):
-            edge_mask = compute_edge(point_map[i, :, :, 2])
-            edge_mask = dilation_mask(edge_mask, args.edge_dilation_radius)
-            mask[i] = mask[i] & (~edge_mask)
-    
+    # Normalize colors to [0, 255] if needed (assuming they might be in [0, 1] or [0, 255])
+    if colors.max() <= 1.0:
+        colors = (colors * 255).astype(np.uint8)
+    else:
+        colors = colors.astype(np.uint8)
 
     server = viser.ViserServer(port=args.port)
     server.request_share_url()
-    num_frames = len(frames)
+    num_frames = len(positions)
 
     # Add playback UI.
     with server.gui.add_folder("Playback"):
@@ -96,7 +65,7 @@ if __name__ == '__main__':
         gui_prev_frame = server.gui.add_button("Prev Frame", disabled=False)
         gui_playing = server.gui.add_checkbox("Playing", False)
         gui_framerate = server.gui.add_slider(
-            "FPS", min=1, max=60, step=1, initial_value=round(vid.get_avg_fps())
+            "FPS", min=1, max=60, step=1, initial_value=30
         )
         gui_framerate_options = server.gui.add_button_group(
             "FPS options", ("10", "20", "30", "60")
@@ -147,10 +116,9 @@ if __name__ == '__main__':
     )
     frame_nodes: list[viser.FrameHandle] = []
     for i in tqdm(range(num_frames)):
-        # pcd, color = pcds[i], colors[i]
-
-        position = point_map[i].reshape(-1, 3)[mask[i].reshape(-1)].numpy()
-        color = frames[i].reshape(-1, 3)[mask[i].reshape(-1)].numpy().astype(np.uint8)
+        # Extract position and color for this frame
+        position = positions[i]  # [num_pc, 3]
+        color = colors[i]        # [num_pc, 3]
 
         # Add base frame.
         frame_nodes.append(server.scene.add_frame(
@@ -179,4 +147,3 @@ if __name__ == '__main__':
             gui_timestep.value = (gui_timestep.value + 1) % num_frames
 
         time.sleep(1.0 / gui_framerate.value)
-        
