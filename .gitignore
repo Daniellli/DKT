@@ -8,6 +8,8 @@ data/*
 logs/*
 
 
+.DS_Store
+
 
 *pyc
 
