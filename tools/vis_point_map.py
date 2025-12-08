@@ -147,3 +147,4 @@ if __name__ == '__main__':
             gui_timestep.value = (gui_timestep.value + 1) % num_frames
 
         time.sleep(1.0 / gui_framerate.value)
+        
