@@ -908,7 +908,7 @@ class DKTPipeline:
         
         
             
-    def prediction2pc(self, prediction_depth_map, RGB_frames, indices, return_pcd = True):
+    def prediction2pc(self, prediction_depth_map, RGB_frames, indices, return_pcd = True,nb_neighbors = 20, std_ratio = 3.0):
         resize_W,resize_H = RGB_frames[0].size
         pcds = []
         moge_device = self.moge_pipe.device if self.moge_pipe is not None else torch.device("cuda:0")
@@ -939,7 +939,7 @@ class DKTPipeline:
 
             if return_pcd:
                 #* [15,50], [2,3] 
-                cl, ind = pcd.remove_statistical_outlier(nb_neighbors=50, std_ratio=3.0)
+                cl, ind = pcd.remove_statistical_outlier(nb_neighbors=nb_neighbors, std_ratio=std_ratio)
                 pcd = pcd.select_by_index(ind)
                 #todo downsample
             
