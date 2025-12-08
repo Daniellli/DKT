@@ -1,5 +1,7 @@
 
 import os
+# Set tokenizers parallelism to avoid warnings when forking processes
+os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 import gradio as gr
 import numpy as np
 import torch

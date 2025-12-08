@@ -935,7 +935,15 @@ class DKTPipeline:
             moge_intrinsics[0, 2] *= resize_W
             moge_intrinsics[1, 2] *= resize_H
             
-            pcds.append(depth2pcd(metric_depth, moge_intrinsics, color=input_image_np, input_mask=moge_mask, ret_pcd=return_pcd))
+            pcd = depth2pcd(metric_depth, moge_intrinsics, color=input_image_np, input_mask=moge_mask, ret_pcd=return_pcd)
+
+            if return_pcd:
+                #* [15,50], [2,3] 
+                cl, ind = pcd.remove_statistical_outlier(nb_neighbors=50, std_ratio=3.0)
+                pcd = pcd.select_by_index(ind)
+                #todo downsample
+            
+            pcds.append(pcd)
         
         return pcds
 

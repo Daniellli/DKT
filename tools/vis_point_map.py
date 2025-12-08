@@ -23,6 +23,7 @@ if __name__ == '__main__':
     if len(point_cloud_data.shape) == 4 and point_cloud_data.shape[1] == 1:
         point_cloud_data = np.squeeze(point_cloud_data, axis=1)
     logger.info(f"point_cloud_data.shape: {point_cloud_data.shape}")
+    
 
     # Extract positions (first 3 dims) and colors (last 3 dims)
     positions = point_cloud_data[:, :, :3]  # [num_frame, num_pc, 3]
@@ -121,11 +122,15 @@ if __name__ == '__main__':
         color = colors[i]        # [num_pc, 3]
 
         # Add base frame.
-        frame_nodes.append(server.scene.add_frame(
+        frame_node = server.scene.add_frame(
             f"/frames/t{i}", 
             show_axes=False, 
             wxyz=tf.SO3.exp(np.array([0.0, 0.0, np.pi])).wxyz
-        ))
+        )
+        frame_nodes.append(frame_node)
+        
+        # Set visibility: only show the first frame initially
+        frame_node.visible = (i == 0)
 
         # Place the point cloud in the frame.
         server.scene.add_point_cloud(
@@ -135,10 +140,6 @@ if __name__ == '__main__':
             point_size=args.point_size * args.scale_factor,
             point_shape="rounded",
         )
-
-    # Hide all but the current frame.
-    for i, frame_node in enumerate(frame_nodes):
-        frame_node.visible = i == gui_timestep.value
 
     # Playback update loop.
     prev_timestep = gui_timestep.value
