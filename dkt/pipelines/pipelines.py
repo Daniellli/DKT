@@ -750,7 +750,7 @@ def resize_frame(frame, height, width):
 
 
 from moge.model.v2 import MoGeModel
-from tools.eval_utils import transfer_pred_disp2depth, colorize_depth_map
+from tools.eval_utils import transfer_pred_disp2depth, transfer_pred_disp2depth_v2, colorize_depth_map
 from tools.depth2pcd import depth2pcd
 import cv2, copy
 class DKTPipeline:
@@ -982,6 +982,57 @@ class DKTPipeline:
 
 
     
+    def prediction2pc_v2(self, prediction_depth_map, RGB_frames, indices, return_pcd = True,nb_neighbors = 20, std_ratio = 3.0):
+        """
+            call MoGe once 
+        """
+        resize_W,resize_H = RGB_frames[0].size
+        pcds = []
+        moge_device = self.moge_pipe.device if self.moge_pipe is not None else torch.device("cuda:0")
+        
+        for iidx, idx in enumerate(tqdm(indices)):
+
+            orgin_rgb_frame = RGB_frames[idx]
+            predicted_depth = prediction_depth_map[idx]
+            input_image_np = np.array(orgin_rgb_frame)  # Convert PIL Image to numpy array
+
+
+            if iidx == 0:
+                # Read the input image and convert to tensor (3, H, W) with RGB values normalized to [0, 1]
+                input_image = torch.tensor(input_image_np / 255, dtype=torch.float32, device=moge_device).permute(2, 0, 1) 
+                output = self.moge_pipe.infer(input_image)
+
+                #* "dict_keys(['points', 'intrinsics', 'depth', 'mask', 'normal'])"
+                moge_intrinsics = output['intrinsics'].cpu().numpy()
+                moge_mask = output['mask'].cpu().numpy()
+                moge_depth = output['depth'].cpu().numpy()
+
+                metric_depth, scale, shift = transfer_pred_disp2depth(predicted_depth, moge_depth, moge_mask, return_scale_shift=True)
+
+                moge_intrinsics[0, 0] *= resize_W 
+                moge_intrinsics[1, 1] *= resize_H
+                moge_intrinsics[0, 2] *= resize_W
+                moge_intrinsics[1, 2] *= resize_H
+            else:
+                metric_depth = transfer_pred_disp2depth_v2(predicted_depth, scale, shift)
+
+            
+            
+
+            # logger.info(f"mask sum: {moge_mask.sum()}")
+            
+            pcd = depth2pcd(metric_depth, moge_intrinsics, color=input_image_np, input_mask=moge_mask, ret_pcd=return_pcd)
+
+            if return_pcd:
+                #* [15,50], [2,3] 
+                cl, ind = pcd.remove_statistical_outlier(nb_neighbors=nb_neighbors, std_ratio=std_ratio)
+                pcd = pcd.select_by_index(ind)
+                #todo downsample
+            
+            pcds.append(pcd)
+        
+        return pcds
+
 
     
 

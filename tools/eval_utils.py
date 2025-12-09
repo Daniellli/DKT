@@ -102,8 +102,9 @@ def align_depth_least_square(
 
 
 
-def transfer_pred_disp2depth(all_pred_disparity, all_gt_depths, all_masks):
+def transfer_pred_disp2depth(all_pred_disparity, all_gt_depths, all_masks, return_scale_shift=False):
     gt_disparity,gt_non_neg_mask = depth2disparity(all_gt_depths, return_mask=True)
+
     pred_non_neg_mask = all_pred_disparity > 0
     valid_non_neg_mask = pred_non_neg_mask & gt_non_neg_mask & all_masks
 
@@ -117,6 +118,29 @@ def transfer_pred_disp2depth(all_pred_disparity, all_gt_depths, all_masks):
             align_disp_pred, a_min=1e-3, a_max=None
         )  # avoid 0 disparity
     all_pred_depths = disparity2depth(align_disp_pred)
+    if return_scale_shift:
+        return all_pred_depths, scale, shift
+    else:
+        return all_pred_depths
+
+    
+
+"""
+not gt needed to transfer
+"""
+def transfer_pred_disp2depth_v2(all_pred_disparity, scale, shift):
+    
+
+    ori_shape =all_pred_disparity.shape
+    tmp = all_pred_disparity.squeeze()
+    tmp = tmp * scale + shift
+    align_disp_pred = tmp.reshape(ori_shape)
+    
+    align_disp_pred = np.clip(
+            align_disp_pred, a_min=1e-3, a_max=None
+        )  # avoid 0 disparity
+    all_pred_depths = disparity2depth(align_disp_pred)
+
     return all_pred_depths
 
     

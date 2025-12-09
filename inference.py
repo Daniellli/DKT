@@ -84,7 +84,7 @@ for line in tqdm(jsonl_data):
     total_frames = len(prediction['rgb_frames'])
     selected_frame_idx = list(range(total_frames))
 
-    all_pc = pipe.prediction2pc(prediction['depth_map'], prediction['rgb_frames'], selected_frame_idx, return_pcd=True)
+    all_pc = pipe.prediction2pc_v2(prediction['depth_map'], prediction['rgb_frames'], selected_frame_idx, return_pcd=True)
 
     # new_pcs = np.concatenate([x[None,...] for x in all_pc], axis=0)
 
