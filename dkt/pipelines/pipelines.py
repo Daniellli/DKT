@@ -756,8 +756,39 @@ import cv2, copy
 class DKTPipeline:
     def __init__(self,  ):
 
-        self.main_pipe = self.init_model()
+        # self.main_pipe = self.init_model()
+        self.main_pipe = self.init_model_14B()
+        
         self.moge_pipe = self.load_moge_model()
+
+
+
+    def init_model_14B(self):
+        """加载14B模型到指定GPU"""
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        pipe = WanVideoPipeline.from_pretrained(
+            torch_dtype=torch.bfloat16,
+            device=device,
+            model_configs=[
+                ModelConfig(model_id="PAI/Wan2.1-Fun-14B-Control", origin_file_pattern="diffusion_pytorch_model*.safetensors", offload_device="cpu"),
+                ModelConfig(model_id="PAI/Wan2.1-Fun-14B-Control", origin_file_pattern="models_t5_umt5-xxl-enc-bf16.pth", offload_device="cpu"),
+                ModelConfig(model_id="PAI/Wan2.1-Fun-14B-Control", origin_file_pattern="Wan2.1_VAE.pth", offload_device="cpu"),
+                ModelConfig(model_id="PAI/Wan2.1-Fun-14B-Control", origin_file_pattern="models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth", offload_device="cpu"),
+            ],
+            redirect_common_files=False,
+            training_strategy="origin",
+        )
+        
+
+        
+        pipe.load_lora(pipe.dit, 'DKT_models/T2SQNet_glassverse_cleargrasp_HISS_DREDS_DREDS_14B_depth_70k_lora.safetensors', alpha=1.0)
+        
+        # 启用内存管理
+        pipe.enable_vram_management()
+        
+        return pipe
+
 
 
     def init_model(self ):

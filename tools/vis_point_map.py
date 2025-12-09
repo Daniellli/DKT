@@ -403,12 +403,19 @@ if __name__ == '__main__':
                     
                     # Save video using imageio
                     try:
+                        # Record start time
+                        save_start_time = time.time()
+                        
                         writer = imageio.get_writer(output_path, fps=gui_framerate.value)
                         for frame in tqdm(frames_to_save, desc="Saving video"):
                             writer.append_data(frame)
                         writer.close()
+                        
+                        # Calculate elapsed time
+                        save_elapsed_time = time.time() - save_start_time
                         logger.info(f"Video saved to {output_path}")
-                        gui_recording_progress.value = f"Video saved: {output_path}"
+                        logger.info(f"Video saving took {save_elapsed_time:.2f} seconds ({save_elapsed_time/60:.2f} minutes)")
+                        gui_recording_progress.value = f"Video saved: {output_path} (took {save_elapsed_time:.2f}s)"
                     except Exception as e:
                         logger.error(f"Failed to save video: {e}")
                         gui_recording_progress.value = f"Error saving video: {e}"
