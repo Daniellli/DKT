@@ -79,7 +79,6 @@ if __name__ == '__main__':
     parser.add_argument("--point_size", type=float, default=0.002, help='point size')  
     parser.add_argument("--scale_factor", type=float, default=8.0, help='point cloud scale factor for visualization')
     parser.add_argument("--port", type=int, default=7891, help='port')
-    parser.add_argument("--output_dir", type=str, default="logs/recordings", help='output directory for recorded videos')
     parser.add_argument("--record_width", type=int, default=640, help='recording video width')
     parser.add_argument("--record_height", type=int, default=480, help='recording video height')
     parser.add_argument("--camera_distance_factor", type=float, default=1.5, help='camera distance factor (smaller = closer, default: 0.3)')
@@ -387,9 +386,8 @@ if __name__ == '__main__':
                 
                 # Save video
                 if len(recording_state['frames']) > 0:
-                    os.makedirs(args.output_dir, exist_ok=True)
-                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    output_path = os.path.join(args.output_dir, f"recording_{timestamp}.mp4")
+                    output_dir = os.path.dirname(args.data_path)
+                    output_path = os.path.join(output_dir, 'pc_video.mp4')
                     
                     # Convert frames to numpy arrays if needed
                     frames_to_save = []
