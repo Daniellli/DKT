@@ -202,12 +202,8 @@ if __name__ == '__main__':
         gui_next_frame = server.gui.add_button("Next Frame", disabled=False)
         gui_prev_frame = server.gui.add_button("Prev Frame", disabled=False)
         gui_playing = server.gui.add_checkbox("Playing", False)
-        gui_framerate = server.gui.add_slider(
-            "FPS", min=1, max=60, step=1, initial_value=30
-        )
-        gui_framerate_options = server.gui.add_button_group(
-            "FPS options", ("10", "20", "30", "60")
-        )
+        
+        
     
     # Add recording UI.
     with server.gui.add_folder("Recording"):
@@ -215,7 +211,7 @@ if __name__ == '__main__':
         gui_record_button = server.gui.add_button("Start Recording", disabled=False)
         gui_recording_progress = server.gui.add_text(
             "Ready to record",
-            initial_value="Ready to record"
+            initial_value="Ready to record",
         )
     
     # Recording state (defined before handlers to avoid nonlocal issues)
@@ -261,11 +257,7 @@ if __name__ == '__main__':
         gui_next_frame.disabled = gui_playing.value
         gui_prev_frame.disabled = gui_playing.value
 
-    # Set the framerate when we click one of the options.
-    @gui_framerate_options.on_click
-    def _(_) -> None:
-        gui_framerate.value = int(gui_framerate_options.value)
-    
+
     # Recording button handler - one-click recording: auto play, record, and save
     @gui_record_button.on_click
     def _(_) -> None:
@@ -346,7 +338,9 @@ if __name__ == '__main__':
     # Combine rotations: first rotate 90° around X-axis, then 180° around Z-axis
     rotation_x = tf.SO3.exp(np.array([np.pi / 2.0, 0.0, 0.0]))  # Rotate 90° around X-axis
     rotation_z = tf.SO3.exp(np.array([0.0, 0.0, np.pi]))        # Rotate 180° around Z-axis
-    combined_rotation = rotation_x * rotation_z  # Combine rotations
+    # Combine rotations by multiplying rotation matrices
+    combined_matrix = rotation_x.as_matrix() @ rotation_z.as_matrix()
+    combined_rotation = tf.SO3.from_matrix(combined_matrix)
     
     server.scene.add_frame(
         "/frames/point_cloud_frame",
@@ -456,7 +450,7 @@ if __name__ == '__main__':
                         # Record start time
                         save_start_time = time.time()
                         
-                        writer = imageio.get_writer(output_path, fps=gui_framerate.value)
+                        writer = imageio.get_writer(output_path, fps=30)
                         for frame in tqdm(frames_to_save, desc="Saving video"):
                             writer.append_data(frame)
                         writer.close()
@@ -481,13 +475,13 @@ if __name__ == '__main__':
         
         # Capture frame if recording
         if recording_state['is_recording'] and recording_state.get('capture_this_frame', False):
-            recording_state['capture_this_frame'] = False
+            # recording_state['capture_this_frame'] = False
             try:
                 # Try to get client handle if not already set
                 client_handle = recording_state.get('client_handle')
-                if client_handle is None:
-                    client_handle = recording_state['get_client']()
-                    recording_state['client_handle'] = client_handle
+                # if client_handle is None:
+                #     client_handle = recording_state['get_client']()
+                #     recording_state['client_handle'] = client_handle
                 
                 if client_handle is not None:
                     # Use viser client's get_render() method to capture screenshot
@@ -496,11 +490,15 @@ if __name__ == '__main__':
                         # Returns RGB array (H, W, 3) for JPEG format
                         if recording_state.get('use_current_view', False):
                             # Use current browser camera view (don't specify position/wxyz)
+                            start_time = time.time()
                             render_image = client_handle.get_render(
                                 height=recording_state['record_height'],
                                 width=recording_state['record_width'],
-                                transport_format='jpeg'  # Use JPEG for faster capture
+                                transport_format='jpeg',  
+                                jpeg_quality=65, 
                             )
+                            elapsed_time = time.time() - start_time
+                            logger.debug(f"client_handle.get_render spent {elapsed_time:.4f} seconds (current browser view mode) for an image of size {recording_state['record_width']} X {recording_state['record_height']}") #* 1920 X 1280: 3.7279 secon
                         else:
                             # Use fixed camera position and orientation
                             render_image = client_handle.get_render(
@@ -527,5 +525,5 @@ if __name__ == '__main__':
                 if len(recording_state['frames']) % 10 == 0:
                     logger.warning(f"Frame capture failed (captured {len(recording_state['frames'])} frames so far): {e}")
 
-        time.sleep(1.0 / gui_framerate.value)
+        # time.sleep(1.0 / gui_framerate.value)
         
