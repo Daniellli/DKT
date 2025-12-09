@@ -71,6 +71,25 @@ def compute_camera_pose(position, look_at, up_direction=np.array([0, 0, 1])):
     wxyz = so3.wxyz
     return wxyz
 
+def downsample_point_cloud_random(points, colors, max_points):
+    """
+    Randomly downsample point cloud to max_points.
+    
+    Args:
+        points: (N, 3) array of point positions
+        colors: (N, 3) array of point colors
+        max_points: Maximum number of points to keep
+    
+    Returns:
+        downsampled_points: (M, 3) array
+        downsampled_colors: (M, 3) array
+    """
+    if len(points) <= max_points:
+        return points, colors
+    
+    indices = np.random.choice(len(points), max_points, replace=False)
+    return points[indices], colors[indices]
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('data_path', type=str, default='logs/tmp_save_np_small.npz', help='path to npz file')
@@ -82,6 +101,7 @@ if __name__ == '__main__':
     parser.add_argument("--record_width", type=int, default=640, help='recording video width')
     parser.add_argument("--record_height", type=int, default=480, help='recording video height')
     parser.add_argument("--camera_distance_factor", type=float, default=1.5, help='camera distance factor (smaller = closer, default: 0.3)')
+    parser.add_argument("--max_points_per_frame", type=int, default=300000, help='maximum points per frame after downsampling (0 = disabled)')
     args = parser.parse_args()
 
     # Load data from npz file
@@ -117,6 +137,29 @@ if __name__ == '__main__':
         colors = [(c * 255).astype(np.uint8) for c in colors]
     else:
         colors = [c.astype(np.uint8) for c in colors]
+
+    # Apply downsampling if requested
+    if args.max_points_per_frame > 0:
+        logger.info("Applying downsampling to point clouds...")
+        total_points_before = sum(len(p) for p in positions)
+        downsampled_positions = []
+        downsampled_colors = []
+        
+        for i, (pos, col) in enumerate(tqdm(zip(positions, colors), desc="Downsampling", total=len(positions))):
+            # Apply random downsampling if needed
+            if len(pos) > args.max_points_per_frame:
+                pos, col = downsample_point_cloud_random(pos, col, args.max_points_per_frame)
+            
+            downsampled_positions.append(pos)
+            downsampled_colors.append(col)
+        
+        positions = downsampled_positions
+        colors = downsampled_colors
+        
+        total_points_after = sum(len(p) for p in positions)
+        reduction_ratio = total_points_after / total_points_before if total_points_before > 0 else 1.0
+        logger.info(f"Downsampling complete: {total_points_before} -> {total_points_after} points ({reduction_ratio*100:.1f}% retained)")
+        logger.info(f"Average points per frame: {total_points_after / len(positions):.0f}")
 
     server = viser.ViserServer(port=args.port)
     server.request_share_url()
@@ -279,27 +322,6 @@ if __name__ == '__main__':
     # Use a mutable container to store prev_timestep to avoid nonlocal issues
     prev_timestep_container = {'value': gui_timestep.value}
 
-    # Toggle frame visibility when the timestep slider changes.
-    @gui_timestep.on_update
-    def _(_) -> None:
-        current_timestep = gui_timestep.value
-        prev_timestep = prev_timestep_container['value']
-        with server.atomic():
-
-            # Toggle visibility.
-            frame_nodes[current_timestep].visible = True
-            frame_nodes[prev_timestep].visible = False
-        
-        # Capture frame if recording
-        if recording_state['is_recording']:
-            # Mark that we need to capture this frame
-            # The actual capture will happen in the main loop
-            recording_state['capture_this_frame'] = True
-        
-        prev_timestep_container['value'] = current_timestep
-        server.flush()  # Optional!
-
-    
     # Add transform controls to allow manual dragging and rotating of camera
     camera_transform_controls = server.scene.add_transform_controls(
         name="/camera/recording_camera/controls",
@@ -328,38 +350,82 @@ if __name__ == '__main__':
     logger.info("Camera visualization added to scene")
     logger.info("You can drag the camera position using the transform controls")
     
-    # Load in frames.
+    # Load in frames - optimized: use single point cloud and update data instead of toggling visibility
     server.scene.add_frame(
         "/frames",
         wxyz=tf.SO3.exp(np.array([np.pi / 2.0, 0.0, 0.0])).wxyz,
         position=(0, 0, 0),
         show_axes=False,
     )
-    frame_nodes: list[viser.FrameHandle] = []
-    for i in tqdm(range(num_frames)):
-        # Extract position and color for this frame
-        position = positions[i]  # [num_pc_i, 3] - each frame may have different number of points
-        color = colors[i]        # [num_pc_i, 3] - each frame may have different number of points
+    
+    # Add a sub-frame with the same rotation as original code had for each point cloud frame
+    # This ensures the point cloud orientation is correct (Z-axis rotation by pi)
+    point_cloud_frame = server.scene.add_frame(
+        "/frames/point_cloud_frame",
+        show_axes=False,
+        wxyz=tf.SO3.exp(np.array([0.0, 0.0, np.pi])).wxyz
+    )
+    
+    # Pre-scale all positions and prepare colors for faster switching
+    # Ensure all arrays are C-contiguous and in optimal data types for faster updates
+    logger.info("Preparing point cloud data...")
+    scaled_positions = []
+    for pos in tqdm(positions, desc="Scaling positions"):
+        # Scale and ensure contiguous float32 array for faster transfer
+        scaled_pos = np.ascontiguousarray(pos * args.scale_factor, dtype=np.float32)
+        scaled_positions.append(scaled_pos)
+    
+    # Ensure colors are contiguous uint8 arrays
+    colors = [np.ascontiguousarray(c, dtype=np.uint8) for c in colors]
+    
+    scaled_point_size = args.point_size * args.scale_factor
+    
+    # Create a single point cloud object that we'll update instead of toggling visibility
+    # This is much faster than switching visibility of multiple large point clouds
+    initial_position = scaled_positions[0]
+    initial_color = colors[0]
+    
+    point_cloud_handle = server.scene.add_point_cloud(
+        name="/frames/point_cloud_frame/point_cloud",
+        points=initial_position,
+        colors=initial_color,
+        point_size=scaled_point_size,
+        point_shape="rounded",
+    )
+    
+    # Store frame data for quick access
+    frame_data = {
+        'positions': scaled_positions,
+        'colors': colors
+    }
+    
+    # Keep frame_nodes for compatibility (but won't be used for visibility switching)
+    frame_nodes = [None] * num_frames  # Placeholder, not used in new approach
 
-        # Add base frame.
-        frame_node = server.scene.add_frame(
-            f"/frames/t{i}", 
-            show_axes=False, 
-            wxyz=tf.SO3.exp(np.array([0.0, 0.0, np.pi])).wxyz
-        )
-        frame_nodes.append(frame_node)
+    # Update point cloud data when the timestep slider changes - much faster than toggling visibility
+    # This callback is defined after point_cloud_handle and frame_data are created
+    @gui_timestep.on_update
+    def _(_) -> None:
+        current_timestep = gui_timestep.value
+        prev_timestep = prev_timestep_container['value']
         
-        # Set visibility: only show the first frame initially
-        frame_node.visible = (i == 0)
-
-        # Place the point cloud in the frame.
-        server.scene.add_point_cloud(
-            name=f"/frames/t{i}/point_cloud",
-            points=position * args.scale_factor,
-            colors=color,
-            point_size=args.point_size * args.scale_factor,
-            point_shape="rounded",
-        )
+        # Skip if same frame
+        if current_timestep == prev_timestep:
+            return
+        
+        # Optimized: update point cloud data directly
+        # Data is already C-contiguous from preprocessing, so direct assignment is fastest
+        # Direct assignment without atomic context for faster updates (non-blocking)
+        point_cloud_handle.points = frame_data['positions'][current_timestep]
+        point_cloud_handle.colors = frame_data['colors'][current_timestep]
+        
+        # Capture frame if recording
+        if recording_state['is_recording']:
+            # Mark that we need to capture this frame
+            # The actual capture will happen in the main loop
+            recording_state['capture_this_frame'] = True
+        
+        prev_timestep_container['value'] = current_timestep
 
     # Playback update loop.
     while True:
