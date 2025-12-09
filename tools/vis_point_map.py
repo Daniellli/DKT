@@ -98,10 +98,10 @@ if __name__ == '__main__':
     parser.add_argument("--point_size", type=float, default=0.002, help='point size')  
     parser.add_argument("--scale_factor", type=float, default=8.0, help='point cloud scale factor for visualization')
     parser.add_argument("--port", type=int, default=7891, help='port')
-    parser.add_argument("--record_width", type=int, default=640, help='recording video width')
-    parser.add_argument("--record_height", type=int, default=480, help='recording video height')
+    parser.add_argument("--record_width", type=int, default=1920, help='recording video width')
+    parser.add_argument("--record_height", type=int, default=1280, help='recording video height')
     parser.add_argument("--camera_distance_factor", type=float, default=1.5, help='camera distance factor (smaller = closer, default: 0.3)')
-    parser.add_argument("--max_points_per_frame", type=int, default=300000, help='maximum points per frame after downsampling (0 = disabled)')
+    parser.add_argument("--max_points_per_frame", type=int, default=-1, help='maximum points per frame after downsampling (0 = disabled)')
     args = parser.parse_args()
 
     # Load data from npz file
