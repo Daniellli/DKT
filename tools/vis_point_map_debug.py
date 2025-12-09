@@ -8,6 +8,7 @@ import viser.transforms as tf
 import imageio
 from PIL import Image
 import os
+import threading
 
     
 # Calculate initial camera position and orientation to look at point cloud center
@@ -216,30 +217,19 @@ if __name__ == '__main__':
     
     # Recording state (defined before handlers to avoid nonlocal issues)
     recording_state = {
-        'frames': [],
         'is_recording': False,
-        'start_frame': 0,
-        'capture_this_frame': False,
-        'client_handle': None,
         'record_width': args.record_width,
         'record_height': args.record_height,
         'camera_position': initial_camera_position,
         'camera_wxyz': initial_camera_wxyz,
-        'use_current_view': False  # Flag to use current browser view instead of fixed camera
     }
     
-    # Try to get a client handle for screenshot capture
-    # We'll wait for a client to connect and use it for recording
     def get_client_handle():
         """Get the first connected client handle for screenshot capture"""
-        # Get all connected clients
         clients = list(server.get_clients().values())
         if len(clients) > 0:
             return clients[0]
         return None
-    
-    # Store reference to get client handle function
-    recording_state['get_client'] = get_client_handle
 
     # Frame step buttons.
     @gui_next_frame.on_click
@@ -257,51 +247,6 @@ if __name__ == '__main__':
         gui_next_frame.disabled = gui_playing.value
         gui_prev_frame.disabled = gui_playing.value
 
-
-    # Recording button handler - one-click recording: auto play, record, and save
-    @gui_record_button.on_click
-    def _(_) -> None:
-        # Check if a client is connected for recording
-        client_handle = recording_state['get_client']()
-        if client_handle is None:
-            logger.error("Cannot start recording: No client connected")
-            logger.error("Please open the viser viewer in a browser first")
-            return
-        
-        recording_state['client_handle'] = client_handle
-        
-        # Disable button during recording
-        gui_record_button.disabled = True
-        gui_record_button.name = "Recording..."
-        
-        # Hide camera transform controls during recording
-        camera_transform_controls.visible = False
-        
-        # Check if using current browser view
-        recording_state['use_current_view'] = gui_use_current_view.value
-        
-        # Start recording
-        recording_state['is_recording'] = True
-        recording_state['frames'] = []
-        recording_state['start_frame'] = 0  # Always start from frame 0
-        
-        # Reset to first frame
-        gui_timestep.value = 0
-        
-        # Start playing automatically
-        gui_playing.value = True
-        
-        # Update progress display
-        gui_recording_progress.value = f"Recording: 0/{num_frames} frames (0%)"
-        
-        logger.info("Recording started - will automatically play all frames and save video")
-        logger.info(f"Total frames to record: {num_frames}")
-        if recording_state['use_current_view']:
-            logger.info("Using current browser camera view for recording")
-        else:
-            logger.info(f"Camera set to position: {recording_state['camera_position']}")
-            logger.info(f"Camera orientation (wxyz): {recording_state['camera_wxyz']}")
-            logger.info("Camera will look at point cloud center during recording")
 
     # Use a mutable container to store prev_timestep to avoid nonlocal issues
     prev_timestep_container = {'value': gui_timestep.value}
@@ -399,55 +344,106 @@ if __name__ == '__main__':
         point_cloud_handle.points = frame_data['positions'][current_timestep]
         point_cloud_handle.colors = frame_data['colors'][current_timestep]
         
-        # Capture frame if recording
-        if recording_state['is_recording']:
-            # Mark that we need to capture this frame
-            # The actual capture will happen in the main loop
-            recording_state['capture_this_frame'] = True
-        
         prev_timestep_container['value'] = current_timestep
-
-    # Playback update loop.
-    while True:
-        if gui_playing.value:
-            current_frame = gui_timestep.value
-            next_frame = (current_frame + 1) % num_frames
-            
-            # Update recording progress
-            if recording_state['is_recording']:
-                captured_frames = len(recording_state['frames'])
-                progress_percent = (captured_frames / num_frames) * 100
-                gui_recording_progress.value = f"Recording: {captured_frames}/{num_frames} frames ({progress_percent:.1f}%)"
-                # Log progress every 10 frames
-                if captured_frames % 10 == 0 or captured_frames == num_frames:
-                    logger.info(f"Recording progress: {captured_frames}/{num_frames} frames ({progress_percent:.1f}%)")
-            
-            # Check if we've completed a full cycle (for recording)
-            if recording_state['is_recording'] and next_frame == recording_state['start_frame'] and current_frame != recording_state['start_frame']:
-                # Finished recording all frames, stop and save
-                recording_state['is_recording'] = False
-                gui_playing.value = False
-                gui_recording_progress.value = f"Recording completed: {len(recording_state['frames'])}/{num_frames} frames captured. Saving video..."
-                logger.info(f"Recording completed. Captured {len(recording_state['frames'])} frames")
+    
+    # Recording button handler - one-click recording in background thread
+    # This is placed after frame_data and point_cloud_handle are defined so we can access them
+    @gui_record_button.on_click
+    def _(_) -> None:
+        # Check if a client is connected for recording
+        client_handle = get_client_handle()
+        if client_handle is None:
+            logger.error("Cannot start recording: No client connected")
+            logger.error("Please open the viser viewer in a browser first")
+            return
+        
+        # Check if already recording
+        if recording_state['is_recording']:
+            logger.warning("Recording already in progress")
+            return
+        
+        # Disable button during recording
+        gui_record_button.disabled = True
+        gui_record_button.name = "Recording..."
+        
+        # Hide camera transform controls during recording
+        camera_transform_controls.visible = False
+        
+        # Get recording parameters
+        use_current_view = gui_use_current_view.value
+        camera_position = recording_state['camera_position'].copy()
+        camera_wxyz = recording_state['camera_wxyz'].copy()
+        record_width = recording_state['record_width']
+        record_height = recording_state['record_height']
+        
+        logger.info("Recording started - will play all frames and save video in background thread")
+        logger.info(f"Total frames to record: {num_frames}")
+        if use_current_view:
+            logger.info("Using current browser camera view for recording")
+        else:
+            logger.info(f"Camera set to position: {camera_position}")
+            logger.info(f"Camera orientation (wxyz): {camera_wxyz}")
+        
+        def recording_thread():
+            """Background thread that handles all recording: play, render, and save"""
+            try:
+                recording_state['is_recording'] = True
+                frames = []
+                
+                # Reset to first frame
+                gui_timestep.value = 0
+                gui_recording_progress.value = f"Recording: 0/{num_frames} frames (0%)"
+                
+                # Loop through all frames
+                for frame_idx in range(num_frames):
+                    # Update point cloud to current frame
+                    gui_timestep.value = frame_idx
+                    point_cloud_handle.points = frame_data['positions'][frame_idx]
+                    point_cloud_handle.colors = frame_data['colors'][frame_idx]
+                    
+                    # Capture frame (get_render is synchronous, waits for browser to complete)
+                    try:
+                        if use_current_view:
+                            render_image = client_handle.get_render(
+                                height=record_height,
+                                width=record_width,
+                                transport_format='jpeg',
+                            )
+                        else:
+                            render_image = client_handle.get_render(
+                                height=record_height,
+                                width=record_width,
+                                position=camera_position,
+                                wxyz=camera_wxyz,
+                                transport_format='jpeg'
+                            )
+                        
+                        # Convert to PIL Image and store
+                        img = Image.fromarray(render_image.astype(np.uint8))
+                        frames.append(img)
+                        
+                    except Exception as e:
+                        logger.warning(f"Frame {frame_idx} capture failed: {e}")
+                    
+                    # Update progress
+                    progress_percent = ((frame_idx + 1) / num_frames) * 100
+                    gui_recording_progress.value = f"Recording: {frame_idx + 1}/{num_frames} frames ({progress_percent:.1f}%)"
+                    
+                    if (frame_idx + 1) % 10 == 0 or frame_idx == num_frames - 1:
+                        logger.info(f"Recording progress: {frame_idx + 1}/{num_frames} frames ({progress_percent:.1f}%)")
                 
                 # Save video
-                if len(recording_state['frames']) > 0:
+                gui_recording_progress.value = f"Recording completed: {len(frames)}/{num_frames} frames captured. Saving video..."
+                logger.info(f"Recording completed. Captured {len(frames)} frames")
+                
+                if len(frames) > 0:
                     output_dir = os.path.dirname(args.data_path)
                     output_path = os.path.join(output_dir, 'pc_video.mp4')
                     
-                    # Convert frames to numpy arrays if needed
-                    frames_to_save = []
-                    for frame in recording_state['frames']:
-                        if isinstance(frame, Image.Image):
-                            frames_to_save.append(np.array(frame))
-                        elif isinstance(frame, np.ndarray):
-                            frames_to_save.append(frame)
-                        else:
-                            frames_to_save.append(np.array(frame))
+                    # Convert frames to numpy arrays
+                    frames_to_save = [np.array(f) for f in frames]
                     
-                    # Save video using imageio
                     try:
-                        # Record start time
                         save_start_time = time.time()
                         
                         writer = imageio.get_writer(output_path, fps=30)
@@ -455,7 +451,6 @@ if __name__ == '__main__':
                             writer.append_data(frame)
                         writer.close()
                         
-                        # Calculate elapsed time
                         save_elapsed_time = time.time() - save_start_time
                         logger.info(f"Video saved to {output_path}")
                         logger.info(f"Video saving took {save_elapsed_time:.2f} seconds ({save_elapsed_time/60:.2f} minutes)")
@@ -463,67 +458,29 @@ if __name__ == '__main__':
                     except Exception as e:
                         logger.error(f"Failed to save video: {e}")
                         gui_recording_progress.value = f"Error saving video: {e}"
-                    
-                    recording_state['frames'] = []
                 
-                # Re-enable button and show camera transform controls
+            except Exception as e:
+                logger.error(f"Recording thread error: {e}")
+                gui_recording_progress.value = f"Recording error: {e}"
+            finally:
+                # Cleanup: re-enable button and show camera transform controls
+                recording_state['is_recording'] = False
                 gui_record_button.disabled = False
                 gui_record_button.name = "Start Recording"
                 camera_transform_controls.visible = True
-            else:
-                gui_timestep.value = next_frame
         
-        # Capture frame if recording
-        if recording_state['is_recording'] and recording_state.get('capture_this_frame', False):
-            # recording_state['capture_this_frame'] = False
-            try:
-                # Try to get client handle if not already set
-                client_handle = recording_state.get('client_handle')
-                # if client_handle is None:
-                #     client_handle = recording_state['get_client']()
-                #     recording_state['client_handle'] = client_handle
-                
-                if client_handle is not None:
-                    # Use viser client's get_render() method to capture screenshot
-                    try:
-                        # Request render from client
-                        # Returns RGB array (H, W, 3) for JPEG format
-                        if recording_state.get('use_current_view', False):
-                            # Use current browser camera view (don't specify position/wxyz)
-                            start_time = time.time()
-                            render_image = client_handle.get_render(
-                                height=recording_state['record_height'],
-                                width=recording_state['record_width'],
-                                transport_format='jpeg',  
-                                jpeg_quality=65, 
-                            )
-                            elapsed_time = time.time() - start_time
-                            logger.debug(f"client_handle.get_render spent {elapsed_time:.4f} seconds (current browser view mode) for an image of size {recording_state['record_width']} X {recording_state['record_height']}") #* 1920 X 1280: 3.7279 secon
-                        else:
-                            # Use fixed camera position and orientation
-                            render_image = client_handle.get_render(
-                                height=recording_state['record_height'],
-                                width=recording_state['record_width'],
-                                position=recording_state['camera_position'],
-                                wxyz=recording_state['camera_wxyz'],
-                                transport_format='jpeg'  # Use JPEG for faster capture
-                            )
-                        
-                        # Convert numpy array to PIL Image
-                        # get_render returns RGB array in range [0, 255]
-                        img = Image.fromarray(render_image.astype(np.uint8))
-                        recording_state['frames'].append(img)
-                        
-                    except Exception as e:
-                        # Only log errors occasionally to avoid spam
-                        if len(recording_state['frames']) % 10 == 0:
-                            logger.warning(f"Frame capture failed (captured {len(recording_state['frames'])} frames so far): {e}")
-                else:
-                    logger.warning("No client connected for frame capture")
-            except Exception as e:
-                # Only log errors occasionally to avoid spam
-                if len(recording_state['frames']) % 10 == 0:
-                    logger.warning(f"Frame capture failed (captured {len(recording_state['frames'])} frames so far): {e}")
+        # Start recording in background thread
+        thread = threading.Thread(target=recording_thread, daemon=True)
+        thread.start()
 
-        # time.sleep(1.0 / gui_framerate.value)
+    # Playback update loop - simplified, recording is now handled in background thread
+    while True:
+        if gui_playing.value and not recording_state['is_recording']:
+            # Only advance frames when playing manually (not during recording)
+            current_frame = gui_timestep.value
+            next_frame = (current_frame + 1) % num_frames
+            gui_timestep.value = next_frame
+        
+        # Sleep to control playback speed (30 fps)
+        # time.sleep(1.0 / 30)
         
