@@ -756,8 +756,8 @@ import cv2, copy
 class DKTPipeline:
     def __init__(self,  ):
 
-        # self.main_pipe = self.init_model()
-        self.main_pipe = self.init_model_14B()
+        self.main_pipe = self.init_model()
+        # self.main_pipe = self.init_model_14B()
         
         self.moge_pipe = self.load_moge_model()
 
