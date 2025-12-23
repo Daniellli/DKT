@@ -10,12 +10,14 @@
 [![Hugging Face Space](https://img.shields.io/badge/🤗%20Hugging%20Face%20-Space-yellow)](https://huggingface.co/spaces/Daniellesry/DKT) 
 [![Hugging Face Model](https://img.shields.io/badge/🤗%20Hugging%20Face%20-Model-green)](https://huggingface.co/Daniellesry/DKT-Depth-1-3B) 
 [![Hugging Face Dataset](https://img.shields.io/badge/🤗%20Hugging%20Face%20-Dataset-blue)](https://huggingface.co/datasets/Daniellesry/TransPhy3D) 
-[![YouTube](https://img.shields.io/badge/YouTube-Video-red)](https://youtu.be/Vurjdwa_y38) 
+[![YouTube](https://img.shields.io/badge/▶️%20YouTube-Video-red)](https://youtu.be/Vurjdwa_y38) 
+[![ModelScope Model](https://img.shields.io/badge/🤖%20ModelScope-Model-orange)](https://modelscope.cn/models/Daniellesry/DKT-Depth-1-3B/files) 
+[![ModelScope Dataset](https://img.shields.io/badge/🤖%20ModelScope-Dataset-orange)](https://modelscope.cn/datasets/Daniellesry/TransPhy3D/files) 
 [![License](https://img.shields.io/badge/License-Apache--2.0-929292)](https://www.apache.org/licenses/LICENSE-2.0) 
- </div>
- <!-- [![Paper](https://img.shields.io/badge/arXiv-PDF-b31b1b)](https://arxiv.org/abs/2406.16864)  -->
-<!-- [![ModelScope](https://img.shields.io/badge/%20ModelScope%20-Space-blue)](https://modelscope.cn/studios/Damo_XR_Lab/StableNormal)  -->
+</div>
+ 
 
+<!-- [![Paper](https://img.shields.io/badge/arXiv-PDF-b31b1b)](https://arxiv.org/abs/2406.16864)  -->
 ## 🌟 Takeaways
 
 DKT is a foundation model for **transparent-object 🫙**, **in-the-wild 🌎**, **arbitrary-length ⏳** video depth and normal estimation, facilitating downstream applications such as robot manipulation tasks, policy learning, and so forth.
