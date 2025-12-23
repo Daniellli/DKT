@@ -9,6 +9,8 @@
 [![Website](https://raw.githubusercontent.com/prs-eth/Marigold/main/doc/badges/badge-website.svg)](https://daniellli.github.io/projects/DKT/) 
 [![Hugging Face Space](https://img.shields.io/badge/🤗%20Hugging%20Face%20-Space-yellow)](https://huggingface.co/spaces/Daniellesry/DKT) 
 [![Hugging Face Model](https://img.shields.io/badge/🤗%20Hugging%20Face%20-Model-green)](https://huggingface.co/Daniellesry/DKT-Depth-1-3B) 
+[![Hugging Face Dataset](https://img.shields.io/badge/🤗%20Hugging%20Face%20-Dataset-blue)](https://huggingface.co/datasets/Daniellesry/TransPhy3D) 
+[![YouTube](https://img.shields.io/badge/YouTube-Video-red)](https://youtu.be/Vurjdwa_y38) 
 [![License](https://img.shields.io/badge/License-Apache--2.0-929292)](https://www.apache.org/licenses/LICENSE-2.0) 
  </div>
  <!-- [![Paper](https://img.shields.io/badge/arXiv-PDF-b31b1b)](https://arxiv.org/abs/2406.16864)  -->
