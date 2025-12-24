@@ -753,17 +753,42 @@ from moge.model.v2 import MoGeModel
 from tools.eval_utils import transfer_pred_disp2depth, transfer_pred_disp2depth_v2, colorize_depth_map
 from tools.depth2pcd import depth2pcd
 import cv2, copy
+
+
+
 class DKTPipeline:
-    def __init__(self,  ):
+    def __init__(self, model_path = None, is14B = False, is_depth = True):
 
-        self.main_pipe = self.init_model()
-        # self.main_pipe = self.init_model_14B()
+        if is14B:
+            if model_path is None:
+                if is_depth: #* 14B depth model
+                    model_path = 'Daniellesry/DKT-Depth-14B'
+                else:#* 14B normal Model
+                    model_path = 'Daniellesry/DKT-Normal-14B'
+            self.main_pipe = self.init_model_14B(model_path)
+        else:
+            if model_path is None:
+                if is_depth: #* 1.3B depth model
+                    model_path = 'Daniellesry/DKT-Depth-1-3B'
+                else:#* 1.3B normal Model
+                    raise ValueError("1.3B normal model is not available")
+                    model_path = ...
+
+            self.main_pipe = self.init_model(model_path)
+
+
+        if is_depth:
+            self.prompt = 'depth'
+            
+            self.moge_pipe = self.load_moge_model()
+        else:
+            self.prompt = 'normal'
+
+        logger.info(f'DKT_PIPELINE init success, model_path: {model_path}, is14B: {is14B}, is_depth: {is_depth},prompt: {self.prompt}')
         
-        self.moge_pipe = self.load_moge_model()
+            
 
-
-
-    def init_model_14B(self):
+    def init_model_14B(self,model_id):
         """加载14B模型到指定GPU"""
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -781,17 +806,23 @@ class DKTPipeline:
         )
         
 
+        lora_config = ModelConfig(
+            model_id=model_id,
+            origin_file_pattern="*.safetensors",
+            offload_device="cpu",
+        )
+        lora_config.download_if_necessary(use_usp=False)
         
-        pipe.load_lora(pipe.dit, 'DKT_models/T2SQNet_glassverse_cleargrasp_HISS_DREDS_DREDS_14B_depth_70k_lora.safetensors', alpha=1.0)
+        pipe.load_lora(pipe.dit, lora_config.path, alpha=1.0)
         
-        # 启用内存管理
+        
         pipe.enable_vram_management()
         
         return pipe
 
 
 
-    def init_model(self ):
+    def init_model(self, model_id):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         pipe = WanVideoPipeline.from_pretrained(
@@ -823,9 +854,11 @@ class DKTPipeline:
         )
         
         
+
+        
         lora_config = ModelConfig(
-            model_id="Daniellesry/DKT-Depth-1-3B",
-            origin_file_pattern="dkt-1-3B.safetensors",
+            model_id=model_id ,
+            origin_file_pattern="*.safetensors",
             offload_device="cpu",
         )
         lora_config.download_if_necessary(use_usp=False)
@@ -850,11 +883,12 @@ class DKTPipeline:
 
 
 
-    def __call__(self, video_file, prompt='depth', \
-        negative_prompt='', height=480, width=832, \
+    def __call__(self, video_file, height=480, width=832, \
             num_inference_steps=5, window_size=21, \
                 overlap=3, vis_pc = False, return_rgb = False):
         
+        
+
         
         origin_frames, input_fps = extract_frames_from_video_file(video_file)
 
@@ -882,8 +916,8 @@ class DKTPipeline:
 
         
         video, vae_outs = self.main_pipe(
-            prompt=prompt,
-            negative_prompt=negative_prompt,
+            prompt=self.prompt,
+            negative_prompt='',
             control_video=frames,
             height=height,
             width=width,
@@ -905,7 +939,7 @@ class DKTPipeline:
             origin_frames = [x.transpose(Image.ROTATE_270) for x in origin_frames]
 
         color_predictions = []
-        if prompt == 'depth':
+        if self.prompt == 'depth':
             prediced_depth_map_np = [np.array(item).astype(np.float32).mean(-1)  for item in processed_video]
             prediced_depth_map_np = np.stack(prediced_depth_map_np)
             prediced_depth_map_np = prediced_depth_map_np / 255.0
@@ -917,6 +951,7 @@ class DKTPipeline:
             color_predictions = [colorize_depth_map(item) for item in prediced_depth_map_np_normalized]
         else:
             color_predictions = processed_video
+            prediced_depth_map_np = None
 
         return_dict = {}
         
@@ -925,7 +960,7 @@ class DKTPipeline:
 
 
 
-        if vis_pc and prompt == 'depth':
+        if vis_pc and self.prompt == 'depth':
             vis_pc_num = 4
             indices = np.linspace(0, frame_length-1, vis_pc_num)
             indices = np.round(indices).astype(np.int32)
