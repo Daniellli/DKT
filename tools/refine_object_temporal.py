@@ -224,19 +224,16 @@ def moge_affine_mask_median(pred_disp: np.ndarray,
     # 2) Apply affine (same as moge_affine_mask)
     refined = pred_disp * scales[:, None, None] + shifts[:, None, None]
 
-    # 3) EXTRA: median-filter the refined disparity along time, but only on
-    #          the union of transparent-object pixels.  Background is left
-    #          exactly as the affine refinement produced it.
-    obj_global = np.any(label_maps > 0, axis=0)  # [H, W] bool
-    if obj_global.any():
-        # Apply median_filter directly to the affine-refined stack.  At a
-        # pixel that is transparent in some frames and background in
-        # others, the median naturally mixes both — that is the desired
-        # behaviour (it denoises both kinds of DKT output).  We only use
-        # the smoothed value where obj_global is True.
+    # 3) EXTRA: median-filter the refined disparity along time, but use
+    #          per-frame transparent mask (NOT the union across frames).
+    #          For moving transparent objects, the union is typically
+    #          80-95% of pixels, which destroys the DKT background.  Use
+    #          each frame's own mask so the median window is local.
+    per_frame_obj_coverage = float((label_maps > 0).mean()) * 100.0
+    if (label_maps > 0).any():
         smoothed = median_filter(refined, size=(median_kernel, 1, 1),
                                  mode="nearest")
-        refined = np.where(obj_global[None, :, :], smoothed, refined)
+        refined = np.where(label_maps > 0, smoothed, refined)
 
     return np.clip(refined, 1e-6, None).astype(pred_disp.dtype)
 
@@ -292,20 +289,21 @@ def dkt_temporal_moge_anchor(pred_disp: np.ndarray,
         a_t, b_t = fit_background_affine(pred_disp[t], moge_disp, bg_mask)
         a_seq[t], b_seq[t] = a_t, b_t
 
-    # 1) Smooth DKT disparity along time, transparent regions only.
-    obj_global = np.any(label_maps > 0, axis=0)  # [H, W] bool
+    # 1) Smooth DKT disparity along time, but only USE the smoothed value at
+    #    each frame's own transparent pixels (per-frame mask, not the union).
+    #    The union over 100 frames typically covers 80-95% of pixels for
+    #    moving transparent objects, which destroys the DKT background and
+    #    ruins the metric.  Per-frame masking keeps the median window local:
+    #    a pixel that is transparent in frames [t-k/2, t+k/2] gets the median
+    #    of DKT predictions at those frames at that pixel, otherwise it is
+    #    left at the raw DKT value.
     dkt_smooth = pred_disp.astype(np.float64, copy=True)
-    if obj_global.any() and T >= 2:
-        # Apply median_filter directly to the raw dkt_disp stack.  This
-        # preserves DKT's structure at every pixel (whether the pixel is
-        # transparent or background in a given frame); the median naturally
-        # smooths frame-to-frame noise.  Background pixels are restored
-        # from the original dkt_disp below (we only use the smoothed value
-        # on the union of transparent pixels).
+    per_frame_obj_coverage = float((label_maps > 0).mean()) * 100.0
+    if T >= 2 and (label_maps > 0).any():
         smoothed = median_filter(dkt_smooth,
                                  size=(median_kernel, 1, 1),
                                  mode="nearest")
-        dkt_smooth = np.where(obj_global[None, :, :], smoothed, pred_disp)
+        dkt_smooth = np.where(label_maps > 0, smoothed, pred_disp)
 
     # 2) Compose: refined[t] = a_t * dkt_smooth[t] + b_t
     refined = a_seq[:, None, None] * dkt_smooth + b_seq[:, None, None]
@@ -314,7 +312,7 @@ def dkt_temporal_moge_anchor(pred_disp: np.ndarray,
           f"min={a_seq.min():.4f} max={a_seq.max():.4f}")
     print(f"[dkt_temporal_moge_anchor] b: median={np.median(b_seq):.6f} "
           f"min={b_seq.min():.6f} max={b_seq.max():.6f}")
-    print(f"[dkt_temporal_moge_anchor] obj_global coverage: "
-          f"{obj_global.mean()*100:.2f}% of pixels")
+    print(f"[dkt_temporal_moge_anchor] per-frame obj coverage (mean): "
+          f"{per_frame_obj_coverage:.2f}% of pixels")
 
     return np.clip(refined, 1e-6, None).astype(pred_disp.dtype)

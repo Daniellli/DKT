@@ -26,7 +26,7 @@ def find_scenes(root, depth_suffix):
 
 
 def load_scene(scene_dir, depth_scale, max_frames, stride, depth_suffix,
-               object_mask_suffix="-label.png"):
+               object_mask_suffix="-label.png", transparent_class_ids=None):
     import cv2
     frames, gts, masks, records = load_clearpose_sequence(
         scene_dir,
@@ -50,6 +50,14 @@ def load_scene(scene_dir, depth_scale, max_frames, stride, depth_suffix,
             break
     if labels is not None:
         labels = np.stack(labels)
+        # If a transparent-class whitelist is provided, re-binarize:
+        # only pixels whose instance ID is in the whitelist count as
+        # transparent-object pixels.  This converts ClearPose multi-class
+        # instance labels into a binary foreground mask for the
+        # transparent object(s) of interest.
+        if transparent_class_ids:
+            ids = [int(x) for x in transparent_class_ids.split(",") if x.strip()]
+            labels = np.where(np.isin(labels, ids), 1, 0).astype(np.uint8)
     return frames, gts, masks, labels
 
 
@@ -125,6 +133,10 @@ def main():
                          "and dkt_temporal_moge_anchor")
     ap.add_argument("--object_mask_suffix", default="-label.png",
                     help="filename suffix for transparent-object label files (0=bg, >0=object id)")
+    ap.add_argument("--transparent_class_ids", default="",
+                    help="comma-separated instance IDs in -label.png to treat as transparent; "
+                         "default '' treats any label>0 as transparent (legacy behaviour). "
+                         "ClearPose set2 typically uses 21,24,26,47.")
     ap.add_argument("--metric_eval", action="store_true",
                     help="metric protocol: skip lstsq re-alignment, use MoGe scale directly; "
                          "also runs MoGe-only baseline for comparison")
@@ -154,7 +166,7 @@ def main():
 
     all_m, all_m_moge = [], []
     for si, scene in enumerate(scenes):
-        frames, gt, mask, labels = load_scene(scene, args.depth_scale, args.max_frames, args.stride, args.depth_suffix, args.object_mask_suffix)
+        frames, gt, mask, labels = load_scene(scene, args.depth_scale, args.max_frames, args.stride, args.depth_suffix, args.object_mask_suffix, args.transparent_class_ids)
         if not frames:
             print(f"[{si+1}/{len(scenes)}] {scene}: no usable frames, skip")
             continue
