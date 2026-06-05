@@ -1,0 +1,88 @@
+Phase 1 start: Fri Jun  5 03:18:07 UTC 2026
+
+=== START none 03:18:07 ===
+=== DONE  none 03:31:54  exit=0 ===
+2026-06-05 03:18:23.724 | WARNING  | dkt.pipelines.pipelines:from_pretrained:535 - Using origin generative model  training
+[1/5] scene1  REL=25.66 RMSE=858.271 d1.05=18.08 d1.10=33.66 d1.25=64.60
+[2/5] scene3  REL=32.15 RMSE=963.798 d1.05=12.24 d1.10=23.48 d1.25=49.01
+[3/5] scene4  REL=37.31 RMSE=1085.098 d1.05=10.60 d1.10=19.02 d1.25=38.70
+[4/5] scene5  REL=34.39 RMSE=1131.304 d1.05=8.99 d1.10=18.51 d1.25=41.72
+[5/5] scene6  REL=31.97 RMSE=1060.282 d1.05=12.21 d1.10=23.49 d1.25=47.83
+==== OVERALL (mean over scenes) ====
+delta<1.05  : 12.42
+delta<1.10  : 23.63
+delta<1.25  : 48.37
+
+=== START moge_affine 03:31:54 ===
+=== DONE  moge_affine 03:46:07  exit=0 ===
+2026-06-05 03:32:10.090 | WARNING  | dkt.pipelines.pipelines:from_pretrained:535 - Using origin generative model  training
+[1/5] scene1  REL=23.58 RMSE=855.352 d1.05=20.92 d1.10=39.64 d1.25=69.01
+[2/5] scene3  REL=32.12 RMSE=964.070 d1.05=8.90 d1.10=18.43 d1.25=45.22
+[3/5] scene4  REL=35.26 RMSE=1084.179 d1.05=9.90 d1.10=18.45 d1.25=39.25
+[4/5] scene5  REL=33.79 RMSE=1131.269 d1.05=9.75 d1.10=18.66 d1.25=41.77
+[5/5] scene6  REL=30.30 RMSE=1057.689 d1.05=12.88 d1.10=23.70 d1.25=51.68
+==== OVERALL (mean over scenes) ====
+delta<1.05  : 12.47
+delta<1.10  : 23.78
+delta<1.25  : 49.39
+
+=== START moge_affine_mask 03:46:07 ===
+=== DONE  moge_affine_mask 04:00:57  exit=0 ===
+2026-06-05 03:46:26.175 | WARNING  | dkt.pipelines.pipelines:from_pretrained:535 - Using origin generative model  training
+[1/5] scene1  REL=23.45 RMSE=854.100 d1.05=21.38 d1.10=39.57 d1.25=68.55
+[2/5] scene3  REL=31.02 RMSE=963.319 d1.05=10.92 d1.10=20.82 d1.25=50.66
+[3/5] scene4  REL=35.02 RMSE=1083.623 d1.05=10.63 d1.10=19.82 d1.25=40.11
+[4/5] scene5  REL=32.95 RMSE=1129.370 d1.05=10.69 d1.10=20.33 d1.25=45.12
+[5/5] scene6  REL=29.64 RMSE=1054.406 d1.05=14.22 d1.10=25.65 d1.25=53.23
+==== OVERALL (mean over scenes) ====
+delta<1.05  : 13.57
+delta<1.10  : 25.24
+delta<1.25  : 51.53
+
+=== START moge_affine_mask_median 04:00:57 ===
+=== DONE  moge_affine_mask_median 04:15:31  exit=0 ===
+2026-06-05 04:01:14.968 | WARNING  | dkt.pipelines.pipelines:from_pretrained:535 - Using origin generative model  training
+[1/5] scene1  REL=23.43 RMSE=854.081 d1.05=21.46 d1.10=39.67 d1.25=68.59
+[2/5] scene3  REL=31.02 RMSE=963.322 d1.05=10.92 d1.10=20.82 d1.25=50.64
+[3/5] scene4  REL=35.02 RMSE=1083.638 d1.05=10.65 d1.10=19.81 d1.25=40.10
+[4/5] scene5  REL=32.95 RMSE=1129.370 d1.05=10.70 d1.10=20.33 d1.25=45.12
+[5/5] scene6  REL=29.64 RMSE=1054.396 d1.05=14.21 d1.10=25.65 d1.25=53.25
+==== OVERALL (mean over scenes) ====
+delta<1.05  : 13.59
+delta<1.10  : 25.26
+delta<1.25  : 51.54
+
+===== ALL FOUR DONE Fri Jun  5 04:15:31 UTC 2026 =====
+
+--- none ---
+[1/5] scene1  REL=25.66 RMSE=858.271 d1.05=18.08 d1.10=33.66 d1.25=64.60
+[2/5] scene3  REL=32.15 RMSE=963.798 d1.05=12.24 d1.10=23.48 d1.25=49.01
+[3/5] scene4  REL=37.31 RMSE=1085.098 d1.05=10.60 d1.10=19.02 d1.25=38.70
+[4/5] scene5  REL=34.39 RMSE=1131.304 d1.05=8.99 d1.10=18.51 d1.25=41.72
+[5/5] scene6  REL=31.97 RMSE=1060.282 d1.05=12.21 d1.10=23.49 d1.25=47.83
+delta<1.05  : 12.42
+
+--- moge_affine ---
+[1/5] scene1  REL=23.58 RMSE=855.352 d1.05=20.92 d1.10=39.64 d1.25=69.01
+[2/5] scene3  REL=32.12 RMSE=964.070 d1.05=8.90 d1.10=18.43 d1.25=45.22
+[3/5] scene4  REL=35.26 RMSE=1084.179 d1.05=9.90 d1.10=18.45 d1.25=39.25
+[4/5] scene5  REL=33.79 RMSE=1131.269 d1.05=9.75 d1.10=18.66 d1.25=41.77
+[5/5] scene6  REL=30.30 RMSE=1057.689 d1.05=12.88 d1.10=23.70 d1.25=51.68
+delta<1.05  : 12.47
+
+--- moge_affine_mask ---
+[1/5] scene1  REL=23.45 RMSE=854.100 d1.05=21.38 d1.10=39.57 d1.25=68.55
+[2/5] scene3  REL=31.02 RMSE=963.319 d1.05=10.92 d1.10=20.82 d1.25=50.66
+[3/5] scene4  REL=35.02 RMSE=1083.623 d1.05=10.63 d1.10=19.82 d1.25=40.11
+[4/5] scene5  REL=32.95 RMSE=1129.370 d1.05=10.69 d1.10=20.33 d1.25=45.12
+[5/5] scene6  REL=29.64 RMSE=1054.406 d1.05=14.22 d1.10=25.65 d1.25=53.23
+delta<1.05  : 13.57
+
+--- moge_affine_mask_median ---
+[1/5] scene1  REL=23.43 RMSE=854.081 d1.05=21.46 d1.10=39.67 d1.25=68.59
+[2/5] scene3  REL=31.02 RMSE=963.322 d1.05=10.92 d1.10=20.82 d1.25=50.64
+[3/5] scene4  REL=35.02 RMSE=1083.638 d1.05=10.65 d1.10=19.81 d1.25=40.10
+[4/5] scene5  REL=32.95 RMSE=1129.370 d1.05=10.70 d1.10=20.33 d1.25=45.12
+[5/5] scene6  REL=29.64 RMSE=1054.396 d1.05=14.21 d1.10=25.65 d1.25=53.25
+delta<1.05  : 13.59
+
