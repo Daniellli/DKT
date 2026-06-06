@@ -1,0 +1,55 @@
+found 5 scenes under /workspace/datasets/clearpose/set2
+To avoid repeatedly downloading model files, (alibaba-pai/Wan2.1-Fun-1.3B-Control, models_t5_umt5-xxl-enc-bf16.pth) is redirected to (Wan-AI/Wan2.1-T2V-1.3B, models_t5_umt5-xxl-enc-bf16.pth). You can use `redirect_common_files=False` to disable file redirection.
+To avoid repeatedly downloading model files, (alibaba-pai/Wan2.1-Fun-1.3B-Control, Wan2.1_VAE.pth) is redirected to (Wan-AI/Wan2.1-T2V-1.3B, Wan2.1_VAE.pth). You can use `redirect_common_files=False` to disable file redirection.
+To avoid repeatedly downloading model files, (alibaba-pai/Wan2.1-Fun-1.3B-Control, models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth) is redirected to (Wan-AI/Wan2.1-I2V-14B-480P, models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth). You can use `redirect_common_files=False` to disable file redirection.
+2026-06-06 06:58:01.436 | WARNING  | dkt.pipelines.pipelines:from_pretrained:535 - Using origin generative model  training
+Loading models from: ./checkpoints/alibaba-pai/Wan2.1-Fun-1.3B-Control/diffusion_pytorch_model.safetensors
+    model_name: wan_video_dit model_class: WanModel
+        This model is initialized with extra kwargs: {'has_image_input': True, 'patch_size': [1, 2, 2], 'in_dim': 48, 'dim': 1536, 'ffn_dim': 8960, 'freq_dim': 256, 'text_dim': 4096, 'out_dim': 16, 'num_heads': 12, 'num_layers': 30, 'eps': 1e-06}
+    The following models are loaded: ['wan_video_dit'].
+Loading models from: ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/models_t5_umt5-xxl-enc-bf16.pth
+    model_name: wan_video_text_encoder model_class: WanTextEncoder
+    The following models are loaded: ['wan_video_text_encoder'].
+Loading models from: ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/Wan2.1_VAE.pth
+    model_name: wan_video_vae model_class: WanVideoVAE
+    The following models are loaded: ['wan_video_vae'].
+Loading models from: ./checkpoints/Wan-AI/Wan2.1-I2V-14B-480P/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth
+    model_name: wan_video_image_encoder model_class: WanImageEncoder
+    The following models are loaded: ['wan_video_image_encoder'].
+Using wan_video_text_encoder from ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/models_t5_umt5-xxl-enc-bf16.pth.
+Using wan_video_dit from ./checkpoints/alibaba-pai/Wan2.1-Fun-1.3B-Control/diffusion_pytorch_model.safetensors.
+Using wan_video_vae from ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/Wan2.1_VAE.pth.
+Using wan_video_image_encoder from ./checkpoints/Wan-AI/Wan2.1-I2V-14B-480P/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth.
+No wan_video_motion_controller models available.
+No wan_video_vace models available.
+300 tensors are updated by LoRA.
+2026-06-06 07:00:56.757 | INFO     | dkt.pipelines.pipelines:load_moge_model:875 - Found cached model at checkpoints/moge_ckpt/moge-2-vitl-normal/model.pt, loading from cache...
+2026-06-06 07:01:43.855 | INFO     | dkt.pipelines.pipelines:__init__:787 - DKT_PIPELINE init success, model_path: Daniellesry/DKT-Depth-1-3B-v1.1, is14B: False, is_depth: True,prompt: depth
+using DKT-1.3B  refine=moge_affine_mask
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:13<00:54, 13.51s/it] 40%|████      | 2/5 [00:20<00:29,  9.87s/it] 60%|██████    | 3/5 [00:27<00:17,  8.62s/it] 80%|████████  | 4/5 [00:34<00:07,  7.87s/it]100%|██████████| 5/5 [00:41<00:00,  7.38s/it]100%|██████████| 5/5 [00:41<00:00,  8.24s/it]
+clip_frac=0.2931 (max_depth=2.0)
+[1/5] scene1  REL=7.35 RMSE=0.134 d1.05=54.72 d1.10=78.42 d1.25=94.64
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:16<01:04, 16.14s/it] 40%|████      | 2/5 [00:22<00:31, 10.66s/it] 60%|██████    | 3/5 [00:30<00:18,  9.10s/it] 80%|████████  | 4/5 [00:37<00:08,  8.45s/it]100%|██████████| 5/5 [00:44<00:00,  7.99s/it]100%|██████████| 5/5 [00:44<00:00,  8.97s/it]
+clip_frac=0.2776 (max_depth=2.0)
+[2/5] scene3  REL=6.99 RMSE=0.147 d1.05=50.31 d1.10=81.62 d1.25=97.31
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:45, 11.32s/it] 40%|████      | 2/5 [00:18<00:26,  8.83s/it] 60%|██████    | 3/5 [00:24<00:15,  7.75s/it] 80%|████████  | 4/5 [00:31<00:07,  7.33s/it]100%|██████████| 5/5 [00:38<00:00,  7.07s/it]100%|██████████| 5/5 [00:38<00:00,  7.63s/it]
+clip_frac=0.4142 (max_depth=2.0)
+[3/5] scene4  REL=7.82 RMSE=0.168 d1.05=42.97 d1.10=72.81 d1.25=96.94
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:43, 10.84s/it] 40%|████      | 2/5 [00:17<00:24,  8.28s/it] 60%|██████    | 3/5 [00:23<00:14,  7.41s/it] 80%|████████  | 4/5 [00:30<00:07,  7.16s/it]100%|██████████| 5/5 [00:37<00:00,  7.24s/it]100%|██████████| 5/5 [00:37<00:00,  7.57s/it]
+clip_frac=0.3817 (max_depth=2.0)
+[4/5] scene5  REL=8.34 RMSE=0.141 d1.05=43.59 d1.10=70.14 d1.25=96.43
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.14s/it] 40%|████      | 2/5 [00:16<00:24,  8.17s/it] 60%|██████    | 3/5 [00:23<00:15,  7.61s/it] 80%|████████  | 4/5 [00:32<00:07,  7.82s/it]100%|██████████| 5/5 [00:40<00:00,  7.89s/it]100%|██████████| 5/5 [00:40<00:00,  8.01s/it]
+clip_frac=0.0493 (max_depth=2.0)
+[5/5] scene6  REL=10.44 RMSE=0.158 d1.05=33.00 d1.10=59.19 d1.25=92.87
+
+==== OVERALL (mean over scenes) ====
+REL         : 8.19
+RMSE        : 0.150
+delta<1.05  : 44.92
+delta<1.10  : 72.43
+delta<1.25  : 95.64

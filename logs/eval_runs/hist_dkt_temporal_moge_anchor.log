@@ -1,0 +1,70 @@
+found 5 scenes under /workspace/datasets/clearpose/set2
+To avoid repeatedly downloading model files, (alibaba-pai/Wan2.1-Fun-1.3B-Control, models_t5_umt5-xxl-enc-bf16.pth) is redirected to (Wan-AI/Wan2.1-T2V-1.3B, models_t5_umt5-xxl-enc-bf16.pth). You can use `redirect_common_files=False` to disable file redirection.
+To avoid repeatedly downloading model files, (alibaba-pai/Wan2.1-Fun-1.3B-Control, Wan2.1_VAE.pth) is redirected to (Wan-AI/Wan2.1-T2V-1.3B, Wan2.1_VAE.pth). You can use `redirect_common_files=False` to disable file redirection.
+To avoid repeatedly downloading model files, (alibaba-pai/Wan2.1-Fun-1.3B-Control, models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth) is redirected to (Wan-AI/Wan2.1-I2V-14B-480P, models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth). You can use `redirect_common_files=False` to disable file redirection.
+2026-06-06 07:45:51.492 | WARNING  | dkt.pipelines.pipelines:from_pretrained:535 - Using origin generative model  training
+Loading models from: ./checkpoints/alibaba-pai/Wan2.1-Fun-1.3B-Control/diffusion_pytorch_model.safetensors
+    model_name: wan_video_dit model_class: WanModel
+        This model is initialized with extra kwargs: {'has_image_input': True, 'patch_size': [1, 2, 2], 'in_dim': 48, 'dim': 1536, 'ffn_dim': 8960, 'freq_dim': 256, 'text_dim': 4096, 'out_dim': 16, 'num_heads': 12, 'num_layers': 30, 'eps': 1e-06}
+    The following models are loaded: ['wan_video_dit'].
+Loading models from: ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/models_t5_umt5-xxl-enc-bf16.pth
+    model_name: wan_video_text_encoder model_class: WanTextEncoder
+    The following models are loaded: ['wan_video_text_encoder'].
+Loading models from: ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/Wan2.1_VAE.pth
+    model_name: wan_video_vae model_class: WanVideoVAE
+    The following models are loaded: ['wan_video_vae'].
+Loading models from: ./checkpoints/Wan-AI/Wan2.1-I2V-14B-480P/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth
+    model_name: wan_video_image_encoder model_class: WanImageEncoder
+    The following models are loaded: ['wan_video_image_encoder'].
+Using wan_video_text_encoder from ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/models_t5_umt5-xxl-enc-bf16.pth.
+Using wan_video_dit from ./checkpoints/alibaba-pai/Wan2.1-Fun-1.3B-Control/diffusion_pytorch_model.safetensors.
+Using wan_video_vae from ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/Wan2.1_VAE.pth.
+Using wan_video_image_encoder from ./checkpoints/Wan-AI/Wan2.1-I2V-14B-480P/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth.
+No wan_video_motion_controller models available.
+No wan_video_vace models available.
+300 tensors are updated by LoRA.
+2026-06-06 07:47:54.516 | INFO     | dkt.pipelines.pipelines:load_moge_model:875 - Found cached model at checkpoints/moge_ckpt/moge-2-vitl-normal/model.pt, loading from cache...
+2026-06-06 07:48:45.938 | INFO     | dkt.pipelines.pipelines:__init__:787 - DKT_PIPELINE init success, model_path: Daniellesry/DKT-Depth-1-3B-v1.1, is14B: False, is_depth: True,prompt: depth
+using DKT-1.3B  refine=dkt_temporal_moge_anchor
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:47, 11.80s/it] 40%|████      | 2/5 [00:19<00:28,  9.41s/it] 60%|██████    | 3/5 [00:27<00:17,  8.78s/it] 80%|████████  | 4/5 [00:35<00:08,  8.43s/it]100%|██████████| 5/5 [00:43<00:00,  8.22s/it]100%|██████████| 5/5 [00:43<00:00,  8.66s/it]
+[dkt_temporal_moge_anchor] a: median=3.1042 min=2.3937 max=3.5151
+[dkt_temporal_moge_anchor] b: median=-0.044275 min=-0.221925 max=0.174281
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 40.78% of pixels
+clip_frac=0.2640 (max_depth=2.0)
+[1/5] scene1  REL=7.77 RMSE=0.135 d1.05=50.40 d1.10=76.99 d1.25=94.33
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.42s/it] 40%|████      | 2/5 [00:16<00:24,  8.02s/it] 60%|██████    | 3/5 [00:23<00:14,  7.28s/it] 80%|████████  | 4/5 [00:29<00:06,  6.97s/it]100%|██████████| 5/5 [00:36<00:00,  6.81s/it]100%|██████████| 5/5 [00:36<00:00,  7.24s/it]
+[dkt_temporal_moge_anchor] a: median=2.3925 min=2.0126 max=3.1427
+[dkt_temporal_moge_anchor] b: median=0.069793 min=-0.097166 max=0.209024
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 17.97% of pixels
+clip_frac=0.2736 (max_depth=2.0)
+[2/5] scene3  REL=7.48 RMSE=0.152 d1.05=46.69 d1.10=77.27 d1.25=97.18
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:46, 11.61s/it] 40%|████      | 2/5 [00:19<00:28,  9.36s/it] 60%|██████    | 3/5 [00:27<00:17,  8.69s/it] 80%|████████  | 4/5 [00:35<00:08,  8.32s/it]100%|██████████| 5/5 [00:43<00:00,  8.20s/it]100%|██████████| 5/5 [00:43<00:00,  8.60s/it]
+[dkt_temporal_moge_anchor] a: median=2.2981 min=2.0411 max=2.7179
+[dkt_temporal_moge_anchor] b: median=-0.091430 min=-0.201888 max=0.077339
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 22.89% of pixels
+clip_frac=0.4101 (max_depth=2.0)
+[3/5] scene4  REL=8.35 RMSE=0.171 d1.05=38.62 d1.10=68.80 d1.25=96.57
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:13<00:54, 13.61s/it] 40%|████      | 2/5 [00:21<00:31, 10.39s/it] 60%|██████    | 3/5 [00:29<00:18,  9.27s/it] 80%|████████  | 4/5 [00:37<00:08,  8.76s/it]100%|██████████| 5/5 [00:45<00:00,  8.28s/it]100%|██████████| 5/5 [00:45<00:00,  9.02s/it]
+[dkt_temporal_moge_anchor] a: median=2.9391 min=2.0422 max=3.8044
+[dkt_temporal_moge_anchor] b: median=0.070674 min=-0.008392 max=0.256271
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 21.32% of pixels
+clip_frac=0.3750 (max_depth=2.0)
+[4/5] scene5  REL=8.57 RMSE=0.142 d1.05=42.12 d1.10=68.79 d1.25=95.99
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:46, 11.60s/it] 40%|████      | 2/5 [00:19<00:27,  9.17s/it] 60%|██████    | 3/5 [00:26<00:16,  8.40s/it] 80%|████████  | 4/5 [00:34<00:08,  8.03s/it]100%|██████████| 5/5 [00:40<00:00,  7.47s/it]100%|██████████| 5/5 [00:40<00:00,  8.10s/it]
+[dkt_temporal_moge_anchor] a: median=3.6490 min=2.9300 max=4.4734
+[dkt_temporal_moge_anchor] b: median=-0.239799 min=-0.824375 max=0.005309
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 22.39% of pixels
+clip_frac=0.0472 (max_depth=2.0)
+[5/5] scene6  REL=10.99 RMSE=0.163 d1.05=31.05 d1.10=55.13 d1.25=91.85
+
+==== OVERALL (mean over scenes) ====
+REL         : 8.63
+RMSE        : 0.153
+delta<1.05  : 41.77
+delta<1.10  : 69.40
+delta<1.25  : 95.19
