@@ -1,0 +1,391 @@
+found 5 scenes under /workspace/datasets/clearpose/set2
+To avoid repeatedly downloading model files, (alibaba-pai/Wan2.1-Fun-1.3B-Control, models_t5_umt5-xxl-enc-bf16.pth) is redirected to (Wan-AI/Wan2.1-T2V-1.3B, models_t5_umt5-xxl-enc-bf16.pth). You can use `redirect_common_files=False` to disable file redirection.
+To avoid repeatedly downloading model files, (alibaba-pai/Wan2.1-Fun-1.3B-Control, Wan2.1_VAE.pth) is redirected to (Wan-AI/Wan2.1-T2V-1.3B, Wan2.1_VAE.pth). You can use `redirect_common_files=False` to disable file redirection.
+To avoid repeatedly downloading model files, (alibaba-pai/Wan2.1-Fun-1.3B-Control, models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth) is redirected to (Wan-AI/Wan2.1-I2V-14B-480P, models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth). You can use `redirect_common_files=False` to disable file redirection.
+2026-06-05 22:40:58.058 | WARNING  | dkt.pipelines.pipelines:from_pretrained:535 - Using origin generative model  training
+Loading models from: ./checkpoints/alibaba-pai/Wan2.1-Fun-1.3B-Control/diffusion_pytorch_model.safetensors
+    model_name: wan_video_dit model_class: WanModel
+        This model is initialized with extra kwargs: {'has_image_input': True, 'patch_size': [1, 2, 2], 'in_dim': 48, 'dim': 1536, 'ffn_dim': 8960, 'freq_dim': 256, 'text_dim': 4096, 'out_dim': 16, 'num_heads': 12, 'num_layers': 30, 'eps': 1e-06}
+    The following models are loaded: ['wan_video_dit'].
+Loading models from: ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/models_t5_umt5-xxl-enc-bf16.pth
+    model_name: wan_video_text_encoder model_class: WanTextEncoder
+    The following models are loaded: ['wan_video_text_encoder'].
+Loading models from: ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/Wan2.1_VAE.pth
+    model_name: wan_video_vae model_class: WanVideoVAE
+    The following models are loaded: ['wan_video_vae'].
+Loading models from: ./checkpoints/Wan-AI/Wan2.1-I2V-14B-480P/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth
+    model_name: wan_video_image_encoder model_class: WanImageEncoder
+    The following models are loaded: ['wan_video_image_encoder'].
+Using wan_video_text_encoder from ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/models_t5_umt5-xxl-enc-bf16.pth.
+Using wan_video_dit from ./checkpoints/alibaba-pai/Wan2.1-Fun-1.3B-Control/diffusion_pytorch_model.safetensors.
+Using wan_video_vae from ./checkpoints/Wan-AI/Wan2.1-T2V-1.3B/Wan2.1_VAE.pth.
+Using wan_video_image_encoder from ./checkpoints/Wan-AI/Wan2.1-I2V-14B-480P/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth.
+No wan_video_motion_controller models available.
+No wan_video_vace models available.
+300 tensors are updated by LoRA.
+2026-06-05 22:43:29.031 | INFO     | dkt.pipelines.pipelines:load_moge_model:875 - Found cached model at checkpoints/moge_ckpt/moge-2-vitl-normal/model.pt, loading from cache...
+2026-06-05 22:44:12.488 | INFO     | dkt.pipelines.pipelines:__init__:787 - DKT_PIPELINE init success, model_path: Daniellesry/DKT-Depth-1-3B-v1.1, is14B: False, is_depth: True,prompt: depth
+using DKT-1.3B  refine=dkt_temporal_moge_anchor
+WARNING: scene has 4123 frames > chunk_size=200, inter-chunk scale drift will inflate RMSE
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:13<00:52, 13.10s/it] 40%|████      | 2/5 [00:19<00:27,  9.26s/it] 60%|██████    | 3/5 [00:26<00:15,  7.96s/it] 80%|████████  | 4/5 [00:32<00:07,  7.35s/it]100%|██████████| 5/5 [00:39<00:00,  7.08s/it]100%|██████████| 5/5 [00:39<00:00,  7.82s/it]
+[dkt_temporal_moge_anchor] a: median=3.2589 min=2.6269 max=4.1493
+[dkt_temporal_moge_anchor] b: median=-0.015394 min=-0.307607 max=0.114177
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 45.65% of pixels
+clip_frac=0.0000 (max_depth=10000.0)
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:42, 10.75s/it] 40%|████      | 2/5 [00:17<00:24,  8.24s/it] 60%|██████    | 3/5 [00:23<00:14,  7.50s/it] 80%|████████  | 4/5 [00:30<00:07,  7.12s/it]100%|██████████| 5/5 [00:36<00:00,  6.91s/it]100%|██████████| 5/5 [00:36<00:00,  7.39s/it]
+[dkt_temporal_moge_anchor] a: median=3.3842 min=2.8419 max=4.5038
+[dkt_temporal_moge_anchor] b: median=0.055960 min=-0.090317 max=0.286708
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 48.39% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.91s/it] 40%|████      | 2/5 [00:16<00:23,  7.84s/it] 60%|██████    | 3/5 [00:22<00:14,  7.24s/it] 80%|████████  | 4/5 [00:29<00:06,  6.97s/it]100%|██████████| 5/5 [00:35<00:00,  6.80s/it]100%|██████████| 5/5 [00:35<00:00,  7.18s/it]
+[dkt_temporal_moge_anchor] a: median=2.9392 min=2.1320 max=3.5956
+[dkt_temporal_moge_anchor] b: median=0.114355 min=-0.158121 max=0.251947
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 41.52% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.15s/it] 40%|████      | 2/5 [00:16<00:23,  7.99s/it] 60%|██████    | 3/5 [00:23<00:14,  7.32s/it] 80%|████████  | 4/5 [00:29<00:07,  7.06s/it]100%|██████████| 5/5 [00:36<00:00,  6.86s/it]100%|██████████| 5/5 [00:36<00:00,  7.27s/it]
+[dkt_temporal_moge_anchor] a: median=2.6525 min=2.2607 max=3.6583
+[dkt_temporal_moge_anchor] b: median=-0.016234 min=-0.306524 max=0.134147
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 43.70% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.11s/it] 40%|████      | 2/5 [00:16<00:24,  8.00s/it] 60%|██████    | 3/5 [00:23<00:14,  7.33s/it] 80%|████████  | 4/5 [00:29<00:07,  7.05s/it]100%|██████████| 5/5 [00:36<00:00,  6.87s/it]100%|██████████| 5/5 [00:36<00:00,  7.27s/it]
+[dkt_temporal_moge_anchor] a: median=2.3491 min=1.8388 max=2.8136
+[dkt_temporal_moge_anchor] b: median=0.069915 min=-0.047869 max=0.249750
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 35.17% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.45s/it] 40%|████      | 2/5 [00:17<00:24,  8.22s/it] 60%|██████    | 3/5 [00:23<00:14,  7.48s/it] 80%|████████  | 4/5 [00:30<00:07,  7.09s/it]100%|██████████| 5/5 [00:36<00:00,  6.90s/it]100%|██████████| 5/5 [00:36<00:00,  7.35s/it]
+[dkt_temporal_moge_anchor] a: median=2.2997 min=1.8504 max=2.7579
+[dkt_temporal_moge_anchor] b: median=0.166885 min=-0.087023 max=0.350386
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 42.16% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.40s/it] 40%|████      | 2/5 [00:17<00:24,  8.25s/it] 60%|██████    | 3/5 [00:23<00:14,  7.44s/it] 80%|████████  | 4/5 [00:30<00:07,  7.13s/it]100%|██████████| 5/5 [00:36<00:00,  6.90s/it]100%|██████████| 5/5 [00:36<00:00,  7.35s/it]
+[dkt_temporal_moge_anchor] a: median=1.5478 min=1.2806 max=2.1607
+[dkt_temporal_moge_anchor] b: median=0.317768 min=0.184094 max=0.427030
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 44.73% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.31s/it] 40%|████      | 2/5 [00:16<00:24,  8.11s/it] 60%|██████    | 3/5 [00:23<00:14,  7.43s/it] 80%|████████  | 4/5 [00:30<00:07,  7.07s/it]100%|██████████| 5/5 [00:36<00:00,  6.92s/it]100%|██████████| 5/5 [00:36<00:00,  7.33s/it]
+[dkt_temporal_moge_anchor] a: median=1.7587 min=1.4154 max=3.3784
+[dkt_temporal_moge_anchor] b: median=0.224273 min=-0.433682 max=0.343689
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 40.24% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:46, 11.55s/it] 40%|████      | 2/5 [00:18<00:25,  8.64s/it] 60%|██████    | 3/5 [00:24<00:15,  7.71s/it] 80%|████████  | 4/5 [00:31<00:07,  7.30s/it]100%|██████████| 5/5 [00:37<00:00,  7.01s/it]100%|██████████| 5/5 [00:37<00:00,  7.58s/it]
+[dkt_temporal_moge_anchor] a: median=3.3882 min=2.6189 max=5.8680
+[dkt_temporal_moge_anchor] b: median=-0.053677 min=-0.296276 max=0.240227
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 34.78% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:42, 10.55s/it] 40%|████      | 2/5 [00:17<00:24,  8.28s/it] 60%|██████    | 3/5 [00:23<00:15,  7.56s/it] 80%|████████  | 4/5 [00:30<00:07,  7.14s/it]100%|██████████| 5/5 [00:36<00:00,  6.91s/it]100%|██████████| 5/5 [00:36<00:00,  7.39s/it]
+[dkt_temporal_moge_anchor] a: median=3.2616 min=2.4673 max=5.1191
+[dkt_temporal_moge_anchor] b: median=0.067694 min=-0.607644 max=0.312099
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 36.35% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.36s/it] 40%|████      | 2/5 [00:16<00:24,  8.12s/it] 60%|██████    | 3/5 [00:23<00:14,  7.37s/it] 80%|████████  | 4/5 [00:29<00:07,  7.02s/it]100%|██████████| 5/5 [00:36<00:00,  6.83s/it]100%|██████████| 5/5 [00:36<00:00,  7.28s/it]
+[dkt_temporal_moge_anchor] a: median=3.1885 min=2.5999 max=5.4219
+[dkt_temporal_moge_anchor] b: median=-0.011563 min=-0.263229 max=0.865963
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 49.39% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.32s/it] 40%|████      | 2/5 [00:16<00:24,  8.13s/it] 60%|██████    | 3/5 [00:23<00:14,  7.47s/it] 80%|████████  | 4/5 [00:30<00:07,  7.18s/it]100%|██████████| 5/5 [00:36<00:00,  6.95s/it]100%|██████████| 5/5 [00:36<00:00,  7.37s/it]
+[dkt_temporal_moge_anchor] a: median=2.7316 min=1.9046 max=3.8656
+[dkt_temporal_moge_anchor] b: median=0.041168 min=-0.073005 max=0.194522
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 39.57% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.18s/it] 40%|████      | 2/5 [00:16<00:24,  8.01s/it] 60%|██████    | 3/5 [00:23<00:14,  7.34s/it] 80%|████████  | 4/5 [00:29<00:06,  6.98s/it]100%|██████████| 5/5 [00:36<00:00,  6.82s/it]100%|██████████| 5/5 [00:36<00:00,  7.24s/it]
+[dkt_temporal_moge_anchor] a: median=2.1751 min=1.1107 max=3.6228
+[dkt_temporal_moge_anchor] b: median=0.084323 min=-0.092054 max=0.490592
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 40.61% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.18s/it] 40%|████      | 2/5 [00:16<00:23,  7.96s/it] 60%|██████    | 3/5 [00:23<00:14,  7.31s/it] 80%|████████  | 4/5 [00:29<00:06,  6.98s/it]100%|██████████| 5/5 [00:36<00:00,  6.78s/it]100%|██████████| 5/5 [00:36<00:00,  7.20s/it]
+[dkt_temporal_moge_anchor] a: median=2.2643 min=1.7571 max=3.3832
+[dkt_temporal_moge_anchor] b: median=0.036119 min=-0.212490 max=0.383095
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 36.87% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.30s/it] 40%|████      | 2/5 [00:16<00:24,  8.04s/it] 60%|██████    | 3/5 [00:23<00:14,  7.40s/it] 80%|████████  | 4/5 [00:29<00:07,  7.08s/it]100%|██████████| 5/5 [00:36<00:00,  6.90s/it]100%|██████████| 5/5 [00:36<00:00,  7.31s/it]
+[dkt_temporal_moge_anchor] a: median=2.1611 min=1.2053 max=3.0506
+[dkt_temporal_moge_anchor] b: median=0.113504 min=-0.247590 max=0.607091
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 41.40% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.16s/it] 40%|████      | 2/5 [00:16<00:23,  8.00s/it] 60%|██████    | 3/5 [00:23<00:14,  7.30s/it] 80%|████████  | 4/5 [00:29<00:07,  7.02s/it]100%|██████████| 5/5 [00:36<00:00,  6.85s/it]100%|██████████| 5/5 [00:36<00:00,  7.25s/it]
+[dkt_temporal_moge_anchor] a: median=3.3932 min=2.2954 max=4.2148
+[dkt_temporal_moge_anchor] b: median=0.019322 min=-0.359210 max=0.406630
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 32.36% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:38,  9.55s/it] 40%|████      | 2/5 [00:16<00:23,  7.80s/it] 60%|██████    | 3/5 [00:22<00:14,  7.18s/it] 80%|████████  | 4/5 [00:28<00:06,  6.88s/it]100%|██████████| 5/5 [00:35<00:00,  6.74s/it]100%|██████████| 5/5 [00:35<00:00,  7.09s/it]
+[dkt_temporal_moge_anchor] a: median=3.6575 min=3.0089 max=5.3587
+[dkt_temporal_moge_anchor] b: median=0.046347 min=-0.575669 max=0.243308
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 38.84% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:38,  9.57s/it] 40%|████      | 2/5 [00:15<00:23,  7.70s/it] 60%|██████    | 3/5 [00:22<00:14,  7.14s/it] 80%|████████  | 4/5 [00:28<00:06,  6.86s/it]100%|██████████| 5/5 [00:35<00:00,  6.73s/it]100%|██████████| 5/5 [00:35<00:00,  7.07s/it]
+[dkt_temporal_moge_anchor] a: median=3.3506 min=2.3108 max=4.1690
+[dkt_temporal_moge_anchor] b: median=0.067237 min=-0.227184 max=0.203478
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 41.65% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:43, 10.92s/it] 40%|████      | 2/5 [00:17<00:25,  8.50s/it] 60%|██████    | 3/5 [00:24<00:15,  7.60s/it] 80%|████████  | 4/5 [00:30<00:07,  7.19s/it]100%|██████████| 5/5 [00:37<00:00,  6.94s/it]100%|██████████| 5/5 [00:37<00:00,  7.47s/it]
+[dkt_temporal_moge_anchor] a: median=2.9601 min=2.2015 max=4.1487
+[dkt_temporal_moge_anchor] b: median=0.053904 min=-0.379318 max=0.210612
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 47.21% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.27s/it] 40%|████      | 2/5 [00:16<00:24,  8.01s/it] 60%|██████    | 3/5 [00:23<00:14,  7.30s/it] 80%|████████  | 4/5 [00:29<00:06,  6.98s/it]100%|██████████| 5/5 [00:36<00:00,  6.81s/it]100%|██████████| 5/5 [00:36<00:00,  7.23s/it]
+[dkt_temporal_moge_anchor] a: median=1.7388 min=1.4148 max=2.4010
+[dkt_temporal_moge_anchor] b: median=0.308692 min=0.074112 max=0.492664
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 43.49% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:07<00:29,  7.48s/it] 40%|████      | 2/5 [00:11<00:16,  5.38s/it] 60%|██████    | 3/5 [00:15<00:09,  4.70s/it] 80%|████████  | 4/5 [00:19<00:04,  4.41s/it]100%|██████████| 5/5 [00:23<00:00,  4.22s/it]100%|██████████| 5/5 [00:23<00:00,  4.63s/it]
+[dkt_temporal_moge_anchor] a: median=2.1025 min=1.8000 max=2.7084
+[dkt_temporal_moge_anchor] b: median=0.170624 min=-0.032785 max=0.468514
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 41.97% of pixels
+[1/5] scene1  REL=17.06 RMSE=781.334 d1.05=31.30 d1.10=54.31 d1.25=79.56
+WARNING: scene has 3621 frames > chunk_size=200, inter-chunk scale drift will inflate RMSE
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:37,  9.30s/it] 40%|████      | 2/5 [00:15<00:23,  7.70s/it] 60%|██████    | 3/5 [00:22<00:14,  7.18s/it] 80%|████████  | 4/5 [00:28<00:06,  6.92s/it]100%|██████████| 5/5 [00:35<00:00,  6.76s/it]100%|██████████| 5/5 [00:35<00:00,  7.09s/it]
+[dkt_temporal_moge_anchor] a: median=2.5498 min=1.9600 max=3.4969
+[dkt_temporal_moge_anchor] b: median=0.136695 min=-0.013197 max=0.226472
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 21.25% of pixels
+clip_frac=0.0000 (max_depth=10000.0)
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.91s/it] 40%|████      | 2/5 [00:16<00:23,  7.81s/it] 60%|██████    | 3/5 [00:22<00:14,  7.18s/it] 80%|████████  | 4/5 [00:29<00:06,  6.88s/it]100%|██████████| 5/5 [00:35<00:00,  6.71s/it]100%|██████████| 5/5 [00:35<00:00,  7.11s/it]
+[dkt_temporal_moge_anchor] a: median=2.6858 min=2.0509 max=3.4878
+[dkt_temporal_moge_anchor] b: median=-0.054175 min=-0.468898 max=0.225466
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 23.68% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:42, 10.57s/it] 40%|████      | 2/5 [00:17<00:24,  8.29s/it] 60%|██████    | 3/5 [00:23<00:14,  7.45s/it] 80%|████████  | 4/5 [00:30<00:07,  7.01s/it]100%|██████████| 5/5 [00:36<00:00,  6.79s/it]100%|██████████| 5/5 [00:36<00:00,  7.29s/it]
+[dkt_temporal_moge_anchor] a: median=2.0312 min=1.7120 max=2.6530
+[dkt_temporal_moge_anchor] b: median=0.135748 min=0.027456 max=0.227047
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 33.57% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.44s/it] 40%|████      | 2/5 [00:16<00:24,  8.14s/it] 60%|██████    | 3/5 [00:23<00:14,  7.38s/it] 80%|████████  | 4/5 [00:29<00:07,  7.02s/it]100%|██████████| 5/5 [00:36<00:00,  6.86s/it]100%|██████████| 5/5 [00:36<00:00,  7.30s/it]
+[dkt_temporal_moge_anchor] a: median=1.7670 min=1.4250 max=2.2979
+[dkt_temporal_moge_anchor] b: median=0.182405 min=0.054554 max=0.445316
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 31.66% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.13s/it] 40%|████      | 2/5 [00:16<00:23,  7.94s/it] 60%|██████    | 3/5 [00:23<00:14,  7.32s/it] 80%|████████  | 4/5 [00:29<00:06,  6.96s/it]100%|██████████| 5/5 [00:35<00:00,  6.77s/it]100%|██████████| 5/5 [00:35<00:00,  7.19s/it]
+[dkt_temporal_moge_anchor] a: median=1.4999 min=1.1023 max=1.8218
+[dkt_temporal_moge_anchor] b: median=0.302068 min=0.220904 max=0.457173
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 38.49% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.15s/it] 40%|████      | 2/5 [00:16<00:23,  7.98s/it] 60%|██████    | 3/5 [00:23<00:14,  7.30s/it] 80%|████████  | 4/5 [00:29<00:07,  7.02s/it]100%|██████████| 5/5 [00:36<00:00,  6.82s/it]100%|██████████| 5/5 [00:36<00:00,  7.23s/it]
+[dkt_temporal_moge_anchor] a: median=2.4481 min=1.3639 max=5.4359
+[dkt_temporal_moge_anchor] b: median=-0.058203 min=-0.874978 max=0.251765
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 24.73% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.02s/it] 40%|████      | 2/5 [00:16<00:23,  7.94s/it] 60%|██████    | 3/5 [00:22<00:14,  7.23s/it] 80%|████████  | 4/5 [00:29<00:06,  6.93s/it]100%|██████████| 5/5 [00:35<00:00,  6.70s/it]100%|██████████| 5/5 [00:35<00:00,  7.13s/it]
+[dkt_temporal_moge_anchor] a: median=2.6728 min=1.9364 max=4.2739
+[dkt_temporal_moge_anchor] b: median=0.151056 min=-0.156402 max=0.322207
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 24.29% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:43, 10.95s/it] 40%|████      | 2/5 [00:17<00:24,  8.27s/it] 60%|██████    | 3/5 [00:23<00:15,  7.51s/it] 80%|████████  | 4/5 [00:30<00:07,  7.10s/it]100%|██████████| 5/5 [00:36<00:00,  6.85s/it]100%|██████████| 5/5 [00:36<00:00,  7.36s/it]
+[dkt_temporal_moge_anchor] a: median=2.1128 min=1.6356 max=2.8872
+[dkt_temporal_moge_anchor] b: median=0.000272 min=-0.389221 max=0.116943
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 25.16% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.97s/it] 40%|████      | 2/5 [00:16<00:23,  7.90s/it] 60%|██████    | 3/5 [00:22<00:14,  7.23s/it] 80%|████████  | 4/5 [00:29<00:06,  6.91s/it]100%|██████████| 5/5 [00:35<00:00,  6.73s/it]100%|██████████| 5/5 [00:35<00:00,  7.14s/it]
+[dkt_temporal_moge_anchor] a: median=2.0108 min=1.5557 max=2.3624
+[dkt_temporal_moge_anchor] b: median=0.130484 min=0.060525 max=0.204355
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 28.65% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.38s/it] 40%|████      | 2/5 [00:16<00:24,  8.12s/it] 60%|██████    | 3/5 [00:23<00:14,  7.44s/it] 80%|████████  | 4/5 [00:29<00:07,  7.02s/it]100%|██████████| 5/5 [00:36<00:00,  6.84s/it]100%|██████████| 5/5 [00:36<00:00,  7.29s/it]
+[dkt_temporal_moge_anchor] a: median=1.9730 min=1.4302 max=2.9530
+[dkt_temporal_moge_anchor] b: median=0.079322 min=-0.446077 max=0.571165
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 34.65% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:38,  9.66s/it] 40%|████      | 2/5 [00:16<00:23,  7.78s/it] 60%|██████    | 3/5 [00:22<00:14,  7.18s/it] 80%|████████  | 4/5 [00:29<00:06,  6.89s/it]100%|██████████| 5/5 [00:35<00:00,  6.72s/it]100%|██████████| 5/5 [00:35<00:00,  7.09s/it]
+[dkt_temporal_moge_anchor] a: median=1.7069 min=1.3416 max=2.1081
+[dkt_temporal_moge_anchor] b: median=0.207501 min=0.135087 max=0.737436
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 34.12% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:38,  9.65s/it] 40%|████      | 2/5 [00:16<00:23,  7.80s/it] 60%|██████    | 3/5 [00:22<00:14,  7.20s/it] 80%|████████  | 4/5 [00:29<00:06,  6.91s/it]100%|██████████| 5/5 [00:35<00:00,  6.76s/it]100%|██████████| 5/5 [00:35<00:00,  7.12s/it]
+[dkt_temporal_moge_anchor] a: median=1.5463 min=1.2699 max=2.0300
+[dkt_temporal_moge_anchor] b: median=0.272275 min=0.166771 max=0.387165
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 37.98% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:38,  9.62s/it] 40%|████      | 2/5 [00:15<00:23,  7.69s/it] 60%|██████    | 3/5 [00:22<00:14,  7.08s/it] 80%|████████  | 4/5 [00:28<00:06,  6.87s/it]100%|██████████| 5/5 [00:35<00:00,  6.72s/it]100%|██████████| 5/5 [00:35<00:00,  7.07s/it]
+[dkt_temporal_moge_anchor] a: median=2.5111 min=1.5316 max=4.3098
+[dkt_temporal_moge_anchor] b: median=0.160282 min=-0.142109 max=0.301303
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 28.98% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.87s/it] 40%|████      | 2/5 [00:16<00:23,  7.83s/it] 60%|██████    | 3/5 [00:22<00:14,  7.21s/it] 80%|████████  | 4/5 [00:29<00:06,  6.96s/it]100%|██████████| 5/5 [00:35<00:00,  6.75s/it]100%|██████████| 5/5 [00:35<00:00,  7.14s/it]
+[dkt_temporal_moge_anchor] a: median=2.5109 min=1.8420 max=3.7968
+[dkt_temporal_moge_anchor] b: median=0.146433 min=-0.208532 max=0.278257
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 22.70% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.14s/it] 40%|████      | 2/5 [00:16<00:23,  7.98s/it] 60%|██████    | 3/5 [00:23<00:14,  7.27s/it] 80%|████████  | 4/5 [00:29<00:06,  6.94s/it]100%|██████████| 5/5 [00:35<00:00,  6.75s/it]100%|██████████| 5/5 [00:35<00:00,  7.17s/it]
+[dkt_temporal_moge_anchor] a: median=2.2027 min=1.5942 max=3.1102
+[dkt_temporal_moge_anchor] b: median=0.175598 min=-0.016160 max=0.218330
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 33.28% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.76s/it] 40%|████      | 2/5 [00:16<00:23,  7.83s/it] 60%|██████    | 3/5 [00:22<00:14,  7.21s/it] 80%|████████  | 4/5 [00:29<00:06,  6.90s/it]100%|██████████| 5/5 [00:35<00:00,  6.72s/it]100%|██████████| 5/5 [00:35<00:00,  7.11s/it]
+[dkt_temporal_moge_anchor] a: median=2.1699 min=1.5304 max=3.5631
+[dkt_temporal_moge_anchor] b: median=0.052995 min=-0.202295 max=0.831798
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 31.99% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:43, 10.93s/it] 40%|████      | 2/5 [00:17<00:24,  8.32s/it] 60%|██████    | 3/5 [00:23<00:14,  7.49s/it] 80%|████████  | 4/5 [00:30<00:07,  7.09s/it]100%|██████████| 5/5 [00:36<00:00,  6.85s/it]100%|██████████| 5/5 [00:36<00:00,  7.36s/it]
+[dkt_temporal_moge_anchor] a: median=1.6959 min=1.1567 max=2.2196
+[dkt_temporal_moge_anchor] b: median=0.208387 min=0.080384 max=0.667746
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 32.56% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.76s/it] 40%|████      | 2/5 [00:16<00:23,  7.78s/it] 60%|██████    | 3/5 [00:22<00:14,  7.16s/it] 80%|████████  | 4/5 [00:28<00:06,  6.86s/it]100%|██████████| 5/5 [00:35<00:00,  6.72s/it]100%|██████████| 5/5 [00:35<00:00,  7.09s/it]
+[dkt_temporal_moge_anchor] a: median=1.5726 min=1.1963 max=2.2302
+[dkt_temporal_moge_anchor] b: median=0.243672 min=0.162674 max=0.390505
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 34.92% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:03<00:15,  3.92s/it] 40%|████      | 2/5 [00:04<00:05,  1.97s/it] 60%|██████    | 3/5 [00:05<00:02,  1.33s/it] 80%|████████  | 4/5 [00:05<00:01,  1.05s/it]100%|██████████| 5/5 [00:06<00:00,  1.14it/s]100%|██████████| 5/5 [00:06<00:00,  1.26s/it]
+[dkt_temporal_moge_anchor] a: median=1.3638 min=1.2941 max=1.4295
+[dkt_temporal_moge_anchor] b: median=0.223994 min=0.197014 max=0.260804
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 32.47% of pixels
+[2/5] scene3  REL=21.57 RMSE=912.620 d1.05=26.94 d1.10=47.03 d1.25=68.62
+WARNING: scene has 2241 frames > chunk_size=200, inter-chunk scale drift will inflate RMSE
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.91s/it] 40%|████      | 2/5 [00:16<00:23,  7.92s/it] 60%|██████    | 3/5 [00:22<00:14,  7.21s/it] 80%|████████  | 4/5 [00:29<00:06,  6.89s/it]100%|██████████| 5/5 [00:35<00:00,  6.68s/it]100%|██████████| 5/5 [00:35<00:00,  7.10s/it]
+[dkt_temporal_moge_anchor] a: median=2.3169 min=1.9366 max=2.9321
+[dkt_temporal_moge_anchor] b: median=0.044362 min=-0.043018 max=0.140386
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 27.11% of pixels
+clip_frac=0.0000 (max_depth=10000.0)
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:37,  9.49s/it] 40%|████      | 2/5 [00:15<00:22,  7.66s/it] 60%|██████    | 3/5 [00:22<00:14,  7.11s/it] 80%|████████  | 4/5 [00:29<00:06,  6.94s/it]100%|██████████| 5/5 [00:35<00:00,  6.81s/it]100%|██████████| 5/5 [00:35<00:00,  7.12s/it]
+[dkt_temporal_moge_anchor] a: median=2.3534 min=1.3524 max=3.1757
+[dkt_temporal_moge_anchor] b: median=0.146336 min=-0.167845 max=0.565988
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 30.98% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.91s/it] 40%|████      | 2/5 [00:16<00:23,  7.86s/it] 60%|██████    | 3/5 [00:22<00:14,  7.24s/it] 80%|████████  | 4/5 [00:29<00:06,  6.91s/it]100%|██████████| 5/5 [00:35<00:00,  6.77s/it]100%|██████████| 5/5 [00:35<00:00,  7.15s/it]
+[dkt_temporal_moge_anchor] a: median=1.1449 min=0.7145 max=1.6430
+[dkt_temporal_moge_anchor] b: median=0.295916 min=0.204045 max=0.754001
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 30.34% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.93s/it] 40%|████      | 2/5 [00:16<00:23,  7.84s/it] 60%|██████    | 3/5 [00:22<00:14,  7.14s/it] 80%|████████  | 4/5 [00:29<00:06,  6.90s/it]100%|██████████| 5/5 [00:35<00:00,  6.74s/it]100%|██████████| 5/5 [00:35<00:00,  7.12s/it]
+[dkt_temporal_moge_anchor] a: median=1.3517 min=0.7835 max=1.6260
+[dkt_temporal_moge_anchor] b: median=0.338952 min=0.169421 max=0.813378
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 34.17% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:44, 11.02s/it] 40%|████      | 2/5 [00:19<00:27,  9.24s/it] 60%|██████    | 3/5 [00:26<00:17,  8.62s/it] 80%|████████  | 4/5 [00:34<00:08,  8.35s/it]100%|██████████| 5/5 [00:42<00:00,  8.09s/it]100%|██████████| 5/5 [00:42<00:00,  8.49s/it]
+[dkt_temporal_moge_anchor] a: median=3.0587 min=1.9960 max=4.2597
+[dkt_temporal_moge_anchor] b: median=0.006169 min=-0.428450 max=0.110770
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 26.24% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:42, 10.57s/it] 40%|████      | 2/5 [00:17<00:24,  8.31s/it] 60%|██████    | 3/5 [00:23<00:14,  7.46s/it] 80%|████████  | 4/5 [00:30<00:07,  7.11s/it]100%|██████████| 5/5 [00:36<00:00,  6.92s/it]100%|██████████| 5/5 [00:36<00:00,  7.38s/it]
+[dkt_temporal_moge_anchor] a: median=3.0289 min=2.3487 max=3.5673
+[dkt_temporal_moge_anchor] b: median=0.085418 min=-0.115745 max=0.177055
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 26.68% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.98s/it] 40%|████      | 2/5 [00:16<00:23,  7.94s/it] 60%|██████    | 3/5 [00:22<00:14,  7.21s/it] 80%|████████  | 4/5 [00:29<00:06,  6.98s/it]100%|██████████| 5/5 [00:35<00:00,  6.81s/it]100%|██████████| 5/5 [00:35<00:00,  7.20s/it]
+[dkt_temporal_moge_anchor] a: median=3.2087 min=1.5026 max=4.0203
+[dkt_temporal_moge_anchor] b: median=0.022840 min=-0.505084 max=0.168620
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 28.21% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:44, 11.01s/it] 40%|████      | 2/5 [00:17<00:24,  8.33s/it] 60%|██████    | 3/5 [00:23<00:14,  7.49s/it] 80%|████████  | 4/5 [00:30<00:07,  7.03s/it]100%|██████████| 5/5 [00:36<00:00,  6.83s/it]100%|██████████| 5/5 [00:36<00:00,  7.35s/it]
+[dkt_temporal_moge_anchor] a: median=2.5282 min=1.9234 max=3.3199
+[dkt_temporal_moge_anchor] b: median=0.086285 min=-0.065045 max=0.163863
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 27.07% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.79s/it] 40%|████      | 2/5 [00:16<00:23,  7.87s/it] 60%|██████    | 3/5 [00:22<00:14,  7.23s/it] 80%|████████  | 4/5 [00:29<00:06,  6.96s/it]100%|██████████| 5/5 [00:35<00:00,  6.84s/it]100%|██████████| 5/5 [00:35<00:00,  7.19s/it]
+[dkt_temporal_moge_anchor] a: median=2.4040 min=1.2553 max=3.4018
+[dkt_temporal_moge_anchor] b: median=-0.097240 min=-0.316266 max=0.819767
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 29.99% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.15s/it] 40%|████      | 2/5 [00:16<00:24,  8.05s/it] 60%|██████    | 3/5 [00:23<00:14,  7.36s/it] 80%|████████  | 4/5 [00:29<00:07,  7.01s/it]100%|██████████| 5/5 [00:36<00:00,  6.88s/it]100%|██████████| 5/5 [00:36<00:00,  7.28s/it]
+[dkt_temporal_moge_anchor] a: median=1.6648 min=1.0504 max=2.7119
+[dkt_temporal_moge_anchor] b: median=0.232621 min=0.019686 max=0.667287
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 30.44% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.07s/it] 40%|████      | 2/5 [00:16<00:24,  8.01s/it] 60%|██████    | 3/5 [00:22<00:14,  7.25s/it] 80%|████████  | 4/5 [00:29<00:06,  6.98s/it]100%|██████████| 5/5 [00:36<00:00,  6.88s/it]100%|██████████| 5/5 [00:36<00:00,  7.25s/it]
+[dkt_temporal_moge_anchor] a: median=1.5715 min=1.0460 max=2.2764
+[dkt_temporal_moge_anchor] b: median=0.288112 min=0.186220 max=0.552144
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 32.12% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:04<00:18,  4.51s/it] 40%|████      | 2/5 [00:05<00:07,  2.54s/it] 60%|██████    | 3/5 [00:06<00:03,  1.90s/it] 80%|████████  | 4/5 [00:07<00:01,  1.58s/it]100%|██████████| 5/5 [00:09<00:00,  1.45s/it]100%|██████████| 5/5 [00:09<00:00,  1.82s/it]
+[dkt_temporal_moge_anchor] a: median=1.5667 min=1.4655 max=1.7294
+[dkt_temporal_moge_anchor] b: median=0.229301 min=0.181671 max=0.285663
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 29.16% of pixels
+[3/5] scene4  REL=25.15 RMSE=1027.043 d1.05=22.19 d1.10=39.09 d1.25=61.82
+WARNING: scene has 4091 frames > chunk_size=200, inter-chunk scale drift will inflate RMSE
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.30s/it] 40%|████      | 2/5 [00:16<00:24,  8.10s/it] 60%|██████    | 3/5 [00:23<00:14,  7.35s/it] 80%|████████  | 4/5 [00:29<00:07,  7.05s/it]100%|██████████| 5/5 [00:36<00:00,  6.93s/it]100%|██████████| 5/5 [00:36<00:00,  7.33s/it]
+[dkt_temporal_moge_anchor] a: median=2.5019 min=1.9318 max=3.1509
+[dkt_temporal_moge_anchor] b: median=0.085004 min=-0.070220 max=0.234742
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 19.73% of pixels
+clip_frac=0.0000 (max_depth=10000.0)
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.94s/it] 40%|████      | 2/5 [00:16<00:23,  7.84s/it] 60%|██████    | 3/5 [00:22<00:14,  7.09s/it] 80%|████████  | 4/5 [00:28<00:06,  6.82s/it]100%|██████████| 5/5 [00:35<00:00,  6.69s/it]100%|██████████| 5/5 [00:35<00:00,  7.08s/it]
+[dkt_temporal_moge_anchor] a: median=2.6758 min=1.9017 max=3.4170
+[dkt_temporal_moge_anchor] b: median=0.088524 min=-0.314942 max=0.196476
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 22.33% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.85s/it] 40%|████      | 2/5 [00:16<00:23,  7.92s/it] 60%|██████    | 3/5 [00:22<00:14,  7.25s/it] 80%|████████  | 4/5 [00:29<00:06,  6.99s/it]100%|██████████| 5/5 [00:35<00:00,  6.79s/it]100%|██████████| 5/5 [00:35<00:00,  7.18s/it]
+[dkt_temporal_moge_anchor] a: median=2.1386 min=1.7858 max=2.6700
+[dkt_temporal_moge_anchor] b: median=0.115818 min=-0.167027 max=0.202967
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 30.55% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:45, 11.26s/it] 40%|████      | 2/5 [00:19<00:27,  9.30s/it] 60%|██████    | 3/5 [00:27<00:17,  8.67s/it] 80%|████████  | 4/5 [00:35<00:08,  8.38s/it]100%|██████████| 5/5 [00:42<00:00,  8.18s/it]100%|██████████| 5/5 [00:42<00:00,  8.57s/it]
+[dkt_temporal_moge_anchor] a: median=1.9983 min=1.2684 max=2.5425
+[dkt_temporal_moge_anchor] b: median=0.185225 min=-0.016617 max=0.251944
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 30.36% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:47, 11.92s/it] 40%|████      | 2/5 [00:19<00:28,  9.44s/it] 60%|██████    | 3/5 [00:27<00:17,  8.73s/it] 80%|████████  | 4/5 [00:35<00:08,  8.46s/it]100%|██████████| 5/5 [00:43<00:00,  8.26s/it]100%|██████████| 5/5 [00:43<00:00,  8.70s/it]
+[dkt_temporal_moge_anchor] a: median=1.3783 min=1.1915 max=1.6923
+[dkt_temporal_moge_anchor] b: median=0.266043 min=0.210677 max=0.312557
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 29.47% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:43, 10.86s/it] 40%|████      | 2/5 [00:18<00:26,  8.99s/it] 60%|██████    | 3/5 [00:26<00:17,  8.53s/it] 80%|████████  | 4/5 [00:34<00:08,  8.27s/it]100%|██████████| 5/5 [00:42<00:00,  8.14s/it]100%|██████████| 5/5 [00:42<00:00,  8.46s/it]
+[dkt_temporal_moge_anchor] a: median=1.5448 min=1.2591 max=3.3188
+[dkt_temporal_moge_anchor] b: median=0.240967 min=-0.116211 max=0.349555
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 27.62% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.42s/it] 40%|████      | 2/5 [00:18<00:26,  8.80s/it] 60%|██████    | 3/5 [00:24<00:15,  7.84s/it] 80%|████████  | 4/5 [00:32<00:07,  7.78s/it]100%|██████████| 5/5 [00:40<00:00,  7.74s/it]100%|██████████| 5/5 [00:40<00:00,  8.03s/it]
+[dkt_temporal_moge_anchor] a: median=2.2366 min=1.7565 max=2.5930
+[dkt_temporal_moge_anchor] b: median=0.087084 min=-0.016393 max=0.196645
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 20.91% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:46, 11.57s/it] 40%|████      | 2/5 [00:18<00:25,  8.56s/it] 60%|██████    | 3/5 [00:24<00:15,  7.63s/it] 80%|████████  | 4/5 [00:30<00:07,  7.16s/it]100%|██████████| 5/5 [00:37<00:00,  6.95s/it]100%|██████████| 5/5 [00:37<00:00,  7.51s/it]
+[dkt_temporal_moge_anchor] a: median=2.1990 min=1.8417 max=3.0594
+[dkt_temporal_moge_anchor] b: median=0.090550 min=-0.318427 max=0.196535
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 19.85% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.96s/it] 40%|████      | 2/5 [00:16<00:23,  8.00s/it] 60%|██████    | 3/5 [00:23<00:14,  7.34s/it] 80%|████████  | 4/5 [00:29<00:07,  7.05s/it]100%|██████████| 5/5 [00:36<00:00,  6.87s/it]100%|██████████| 5/5 [00:36<00:00,  7.26s/it]
+[dkt_temporal_moge_anchor] a: median=2.0038 min=1.6991 max=2.8083
+[dkt_temporal_moge_anchor] b: median=0.060672 min=-0.032804 max=0.203735
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 24.17% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:44, 11.11s/it] 40%|████      | 2/5 [00:19<00:27,  9.33s/it] 60%|██████    | 3/5 [00:27<00:17,  8.69s/it] 80%|████████  | 4/5 [00:34<00:08,  8.21s/it]100%|██████████| 5/5 [00:42<00:00,  8.23s/it]100%|██████████| 5/5 [00:42<00:00,  8.57s/it]
+[dkt_temporal_moge_anchor] a: median=1.9580 min=1.5543 max=2.3621
+[dkt_temporal_moge_anchor] b: median=0.136821 min=0.027742 max=0.218244
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 25.60% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.12s/it] 40%|████      | 2/5 [00:16<00:23,  7.98s/it] 60%|██████    | 3/5 [00:24<00:15,  7.82s/it] 80%|████████  | 4/5 [00:32<00:07,  7.98s/it]100%|██████████| 5/5 [00:40<00:00,  7.97s/it]100%|██████████| 5/5 [00:40<00:00,  8.08s/it]
+[dkt_temporal_moge_anchor] a: median=1.4911 min=1.2089 max=1.9772
+[dkt_temporal_moge_anchor] b: median=0.302907 min=0.194113 max=0.368398
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 32.85% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:44, 11.19s/it] 40%|████      | 2/5 [00:19<00:27,  9.23s/it] 60%|██████    | 3/5 [00:26<00:17,  8.59s/it] 80%|████████  | 4/5 [00:34<00:08,  8.34s/it]100%|██████████| 5/5 [00:42<00:00,  8.20s/it]100%|██████████| 5/5 [00:42<00:00,  8.56s/it]
+[dkt_temporal_moge_anchor] a: median=1.5179 min=1.2671 max=1.9467
+[dkt_temporal_moge_anchor] b: median=0.257950 min=0.187455 max=0.340397
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 32.34% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:45, 11.31s/it] 40%|████      | 2/5 [00:19<00:27,  9.18s/it] 60%|██████    | 3/5 [00:26<00:17,  8.58s/it] 80%|████████  | 4/5 [00:33<00:07,  7.95s/it]100%|██████████| 5/5 [00:40<00:00,  7.50s/it]100%|██████████| 5/5 [00:40<00:00,  8.11s/it]
+[dkt_temporal_moge_anchor] a: median=1.4666 min=1.1808 max=2.1540
+[dkt_temporal_moge_anchor] b: median=0.304439 min=0.027313 max=0.378821
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 30.71% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.18s/it] 40%|████      | 2/5 [00:16<00:24,  8.00s/it] 60%|██████    | 3/5 [00:23<00:14,  7.33s/it] 80%|████████  | 4/5 [00:29<00:06,  6.97s/it]100%|██████████| 5/5 [00:36<00:00,  6.82s/it]100%|██████████| 5/5 [00:36<00:00,  7.23s/it]
+[dkt_temporal_moge_anchor] a: median=2.6015 min=1.7704 max=3.5653
+[dkt_temporal_moge_anchor] b: median=0.176659 min=0.031185 max=0.299795
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 25.25% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:38,  9.57s/it] 40%|████      | 2/5 [00:16<00:23,  7.79s/it] 60%|██████    | 3/5 [00:22<00:14,  7.14s/it] 80%|████████  | 4/5 [00:28<00:06,  6.85s/it]100%|██████████| 5/5 [00:35<00:00,  6.69s/it]100%|██████████| 5/5 [00:35<00:00,  7.06s/it]
+[dkt_temporal_moge_anchor] a: median=2.6014 min=2.2045 max=3.2235
+[dkt_temporal_moge_anchor] b: median=-0.000232 min=-0.121849 max=0.215729
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 21.63% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.19s/it] 40%|████      | 2/5 [00:16<00:24,  8.04s/it] 60%|██████    | 3/5 [00:23<00:14,  7.35s/it] 80%|████████  | 4/5 [00:29<00:06,  6.99s/it]100%|██████████| 5/5 [00:36<00:00,  6.82s/it]100%|██████████| 5/5 [00:36<00:00,  7.24s/it]
+[dkt_temporal_moge_anchor] a: median=1.8716 min=1.6275 max=2.2994
+[dkt_temporal_moge_anchor] b: median=0.152388 min=0.082083 max=0.195462
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 23.03% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.02s/it] 40%|████      | 2/5 [00:16<00:23,  7.98s/it] 60%|██████    | 3/5 [00:23<00:14,  7.37s/it] 80%|████████  | 4/5 [00:29<00:07,  7.08s/it]100%|██████████| 5/5 [00:36<00:00,  6.87s/it]100%|██████████| 5/5 [00:36<00:00,  7.27s/it]
+[dkt_temporal_moge_anchor] a: median=2.0045 min=1.6409 max=2.4090
+[dkt_temporal_moge_anchor] b: median=0.104314 min=0.008251 max=0.279905
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 23.78% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:36,  9.24s/it] 40%|████      | 2/5 [00:15<00:23,  7.71s/it] 60%|██████    | 3/5 [00:22<00:14,  7.26s/it] 80%|████████  | 4/5 [00:29<00:07,  7.06s/it]100%|██████████| 5/5 [00:36<00:00,  7.05s/it]100%|██████████| 5/5 [00:36<00:00,  7.28s/it]
+[dkt_temporal_moge_anchor] a: median=1.9633 min=1.5557 max=3.7559
+[dkt_temporal_moge_anchor] b: median=0.064481 min=-0.232311 max=0.225963
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 29.31% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:44, 11.17s/it] 40%|████      | 2/5 [00:17<00:25,  8.42s/it] 60%|██████    | 3/5 [00:24<00:15,  7.59s/it] 80%|████████  | 4/5 [00:30<00:07,  7.14s/it]100%|██████████| 5/5 [00:37<00:00,  6.98s/it]100%|██████████| 5/5 [00:37<00:00,  7.48s/it]
+[dkt_temporal_moge_anchor] a: median=1.6723 min=1.1953 max=2.1688
+[dkt_temporal_moge_anchor] b: median=0.208605 min=0.072546 max=0.309231
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 29.91% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.92s/it] 40%|████      | 2/5 [00:16<00:23,  7.94s/it] 60%|██████    | 3/5 [00:22<00:14,  7.28s/it] 80%|████████  | 4/5 [00:29<00:07,  7.02s/it]100%|██████████| 5/5 [00:36<00:00,  6.86s/it]100%|██████████| 5/5 [00:36<00:00,  7.24s/it]
+[dkt_temporal_moge_anchor] a: median=1.5487 min=1.2196 max=2.2391
+[dkt_temporal_moge_anchor] b: median=0.246161 min=0.165610 max=0.355438
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 29.72% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:05<00:23,  5.84s/it] 40%|████      | 2/5 [00:08<00:12,  4.13s/it] 60%|██████    | 3/5 [00:11<00:07,  3.63s/it] 80%|████████  | 4/5 [00:14<00:03,  3.41s/it]100%|██████████| 5/5 [00:17<00:00,  3.30s/it]100%|██████████| 5/5 [00:17<00:00,  3.60s/it]
+[dkt_temporal_moge_anchor] a: median=1.4045 min=1.2016 max=1.7386
+[dkt_temporal_moge_anchor] b: median=0.202603 min=0.053348 max=0.246735
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 26.17% of pixels
+[4/5] scene5  REL=23.78 RMSE=1051.524 d1.05=25.88 d1.10=44.83 d1.25=64.63
+WARNING: scene has 2133 frames > chunk_size=200, inter-chunk scale drift will inflate RMSE
+  using ClearPose label masks for opaque-region scale estimation
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.86s/it] 40%|████      | 2/5 [00:16<00:23,  7.92s/it] 60%|██████    | 3/5 [00:22<00:14,  7.30s/it] 80%|████████  | 4/5 [00:29<00:07,  7.01s/it]100%|██████████| 5/5 [00:35<00:00,  6.79s/it]100%|██████████| 5/5 [00:35<00:00,  7.19s/it]
+[dkt_temporal_moge_anchor] a: median=2.7664 min=2.1023 max=4.4910
+[dkt_temporal_moge_anchor] b: median=-0.202352 min=-0.754730 max=0.043189
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 23.72% of pixels
+clip_frac=0.0000 (max_depth=10000.0)
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.87s/it] 40%|████      | 2/5 [00:16<00:23,  7.97s/it] 60%|██████    | 3/5 [00:23<00:14,  7.36s/it] 80%|████████  | 4/5 [00:29<00:07,  7.05s/it]100%|██████████| 5/5 [00:36<00:00,  6.89s/it]100%|██████████| 5/5 [00:36<00:00,  7.27s/it]
+[dkt_temporal_moge_anchor] a: median=2.2948 min=1.8008 max=3.1916
+[dkt_temporal_moge_anchor] b: median=0.012890 min=-0.565391 max=0.173135
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 25.14% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:42, 10.69s/it] 40%|████      | 2/5 [00:17<00:24,  8.25s/it] 60%|██████    | 3/5 [00:23<00:14,  7.44s/it] 80%|████████  | 4/5 [00:30<00:07,  7.10s/it]100%|██████████| 5/5 [00:36<00:00,  6.88s/it]100%|██████████| 5/5 [00:36<00:00,  7.35s/it]
+[dkt_temporal_moge_anchor] a: median=2.5705 min=1.6327 max=3.6688
+[dkt_temporal_moge_anchor] b: median=-0.035161 min=-0.703544 max=0.487527
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 26.71% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.21s/it] 40%|████      | 2/5 [00:16<00:24,  8.00s/it] 60%|██████    | 3/5 [00:23<00:14,  7.35s/it] 80%|████████  | 4/5 [00:29<00:07,  7.02s/it]100%|██████████| 5/5 [00:36<00:00,  6.78s/it]100%|██████████| 5/5 [00:36<00:00,  7.22s/it]
+[dkt_temporal_moge_anchor] a: median=1.5868 min=1.3657 max=1.7880
+[dkt_temporal_moge_anchor] b: median=0.362361 min=0.223475 max=0.494410
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 33.98% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:11<00:46, 11.60s/it] 40%|████      | 2/5 [00:18<00:25,  8.60s/it] 60%|██████    | 3/5 [00:24<00:15,  7.66s/it] 80%|████████  | 4/5 [00:31<00:07,  7.24s/it]100%|██████████| 5/5 [00:37<00:00,  6.97s/it]100%|██████████| 5/5 [00:37<00:00,  7.55s/it]
+[dkt_temporal_moge_anchor] a: median=1.7421 min=1.4332 max=2.2626
+[dkt_temporal_moge_anchor] b: median=0.291401 min=0.154054 max=0.353980
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 30.84% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.23s/it] 40%|████      | 2/5 [00:16<00:24,  8.02s/it] 60%|██████    | 3/5 [00:23<00:14,  7.39s/it] 80%|████████  | 4/5 [00:29<00:07,  7.00s/it]100%|██████████| 5/5 [00:36<00:00,  6.81s/it]100%|██████████| 5/5 [00:36<00:00,  7.25s/it]
+[dkt_temporal_moge_anchor] a: median=3.6009 min=1.9459 max=6.2949
+[dkt_temporal_moge_anchor] b: median=-0.184452 min=-1.437161 max=0.135099
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 28.26% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:40, 10.12s/it] 40%|████      | 2/5 [00:16<00:24,  8.05s/it] 60%|██████    | 3/5 [00:23<00:14,  7.37s/it] 80%|████████  | 4/5 [00:29<00:07,  7.01s/it]100%|██████████| 5/5 [00:36<00:00,  6.86s/it]100%|██████████| 5/5 [00:36<00:00,  7.27s/it]
+[dkt_temporal_moge_anchor] a: median=3.3309 min=2.5400 max=4.4992
+[dkt_temporal_moge_anchor] b: median=-0.173104 min=-0.633954 max=0.215123
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 26.04% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:10<00:41, 10.39s/it] 40%|████      | 2/5 [00:16<00:24,  8.03s/it] 60%|██████    | 3/5 [00:23<00:14,  7.35s/it] 80%|████████  | 4/5 [00:29<00:07,  7.04s/it]100%|██████████| 5/5 [00:36<00:00,  6.85s/it]100%|██████████| 5/5 [00:36<00:00,  7.28s/it]
+[dkt_temporal_moge_anchor] a: median=2.7332 min=1.0059 max=6.5246
+[dkt_temporal_moge_anchor] b: median=-0.032251 min=-1.348362 max=0.618806
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 28.61% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:38,  9.74s/it] 40%|████      | 2/5 [00:16<00:23,  7.84s/it] 60%|██████    | 3/5 [00:22<00:14,  7.25s/it] 80%|████████  | 4/5 [00:29<00:06,  6.94s/it]100%|██████████| 5/5 [00:35<00:00,  6.77s/it]100%|██████████| 5/5 [00:35<00:00,  7.15s/it]
+[dkt_temporal_moge_anchor] a: median=3.5724 min=2.7672 max=4.3849
+[dkt_temporal_moge_anchor] b: median=-0.233476 min=-0.704435 max=0.010329
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 30.55% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:09<00:39,  9.79s/it] 40%|████      | 2/5 [00:16<00:23,  7.91s/it] 60%|██████    | 3/5 [00:22<00:14,  7.23s/it] 80%|████████  | 4/5 [00:29<00:06,  6.94s/it]100%|██████████| 5/5 [00:35<00:00,  6.76s/it]100%|██████████| 5/5 [00:35<00:00,  7.15s/it]
+[dkt_temporal_moge_anchor] a: median=2.6251 min=2.1349 max=3.6678
+[dkt_temporal_moge_anchor] b: median=-0.054189 min=-0.757158 max=0.163018
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 27.41% of pixels
+  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:08<00:32,  8.11s/it] 40%|████      | 2/5 [00:12<00:17,  5.78s/it] 60%|██████    | 3/5 [00:16<00:10,  5.06s/it] 80%|████████  | 4/5 [00:20<00:04,  4.70s/it]100%|██████████| 5/5 [00:24<00:00,  4.52s/it]100%|██████████| 5/5 [00:24<00:00,  4.96s/it]
+[dkt_temporal_moge_anchor] a: median=1.5433 min=1.3457 max=2.5767
+[dkt_temporal_moge_anchor] b: median=0.042643 min=-0.010451 max=0.254557
+[dkt_temporal_moge_anchor] per-frame obj coverage (mean): 24.53% of pixels
+[5/5] scene6  REL=22.71 RMSE=1034.897 d1.05=23.26 d1.10=43.00 d1.25=67.66
+
+==== OVERALL (mean over scenes) ====
+REL         : 22.05
+RMSE        : 961.484
+delta<1.05  : 25.92
+delta<1.10  : 45.65
+delta<1.25  : 68.46
